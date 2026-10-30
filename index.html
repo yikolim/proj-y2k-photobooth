@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#f4f0e8" />
     <meta name="description" content="Loop Booth is a private, playful browser photobooth with live filters and social-ready templates." />
     <title>Loop Booth — make a moment</title>
@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./icy.css" />
   </head>
   <body>
     <header class="site-header">
@@ -17,10 +18,10 @@
         <span class="brand-mark" aria-hidden="true">
           <span></span><span></span><span></span><span></span>
         </span>
-        <span>LOOP BOOTH</span>
+        <span>LOOP</span>
       </a>
       <div class="privacy-note"><span class="privacy-dot"></span> Photos stay on this device</div>
-      <a class="header-link" href="#how-it-works">How it works <span>↘</span></a>
+      <button class="header-link" id="settingsShortcut" aria-label="Open booth settings">＋</button>
     </header>
 
     <main>
@@ -43,11 +44,11 @@
               <div class="empty-icon">
                 <span class="lens"></span>
               </div>
-              <h2>Your camera, your canvas</h2>
-              <p>Start your camera or upload a favorite photo to begin.</p>
+              <h2>A moment, on ice.</h2>
+              <p>Your camera. A different atmosphere.</p>
               <div class="empty-actions">
                 <button class="button button-dark" id="startCamera">Start camera</button>
-                <label class="button button-light" for="uploadPhoto">Upload photo</label>
+                <button class="button button-light upload-trigger">Upload photo</button>
                 <input id="uploadPhoto" type="file" accept="image/*" hidden />
               </div>
             </div>
@@ -58,7 +59,7 @@
             <button class="shutter" id="shutter" aria-label="Take photo">
               <span></span>
             </button>
-            <label class="icon-button" for="uploadPhoto" aria-label="Upload photo" title="Upload photo">↥</label>
+            <button class="icon-button upload-trigger" aria-label="Upload photo" title="Upload photo">↥</button>
           </div>
           <div class="stage-caption">
             <span id="statusText">CAMERA OFF</span>
@@ -69,10 +70,11 @@
         <aside class="control-panel">
           <div class="panel-heading">
             <div>
-              <p class="eyebrow">MAKE IT YOURS</p>
-              <h2>Set the mood</h2>
+              <p class="eyebrow">YOUR PERSONAL PHOTO STUDIO</p>
+              <h2>THE BOOTH — ICY</h2>
             </div>
             <button class="text-button" id="resetAll">Reset</button>
+            <button class="panel-toggle" id="panelToggle" aria-expanded="false" aria-label="Expand booth settings">＋</button>
           </div>
 
           <div class="control-group">
@@ -131,7 +133,8 @@
           <button class="download-button" id="downloadButton" disabled>
             <span>Save your photo</span><span>↓</span>
           </button>
-          <p class="download-note">Downloads as a high-quality PNG. Nothing gets uploaded.</p>
+          <button class="download-button share-button" id="shareButton" hidden disabled>Save to Photos / Share ↑</button>
+          <p class="download-note" id="saveNote">Downloads as a high-quality PNG. Nothing gets uploaded.</p>
         </aside>
       </section>
 
