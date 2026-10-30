@@ -360,7 +360,6 @@ function updateShots() {
   shotCount.textContent = `${filledShots()} / ${required}`;
   frameCounter.textContent = currentArt() ? (complete() ? 'READY TO SAVE' : `${required} FACE${required>1?'S':''} · ONE SHOT`) : `${filledShots()} / ${required} CAPTURED`;
   downloadButton.disabled = true;
-  document.querySelector('#artworkTools').hidden = !currentArt();
   document.querySelector('#photoAdjustment').hidden = !currentArt();
   canvasWrap.classList.toggle('artwork-preview', !!currentArt());
   cameraEmpty.classList.toggle('hidden', !!currentArt() || !!getLiveSource());
@@ -459,7 +458,6 @@ function showToast(message) {
 }
 
 document.querySelector('#startCamera').addEventListener('click', startCamera);
-document.querySelector('#enableCamera').addEventListener('click', startCamera);
 document.querySelector('#artworkGallery').innerHTML = Object.entries(artworkTemplates).map(([key,art]) => `<button class="artwork-card" data-template="${key}"><img src="./templates/${art.file}.png" alt="${art.name} photo template"><span>${art.name}</span><small>${art.slots.length} photo${art.slots.length>1?'s':''}</small></button>`).join('');
 document.querySelector('#artworkGallery').addEventListener('click', event => {
   const button=event.target.closest('[data-template]'); if(button) selectTemplate(button);
@@ -477,6 +475,15 @@ function togglePanel(force) {
 }
 // The whole "Select templates" bar is the tap target on phones.
 document.querySelector('#panelOpen').addEventListener('click', () => togglePanel());
+// Bottom tabs: Filter swaps the template strip for the filter strip; Save shares or downloads.
+document.querySelector('#filterTab').addEventListener('click', event => {
+  const open = document.body.classList.toggle('filters-open');
+  event.currentTarget.setAttribute('aria-pressed', String(open));
+});
+document.querySelector('#saveTab').addEventListener('click', () => {
+  if (!exportFile) { showToast(complete() ? 'Preparing your photo…' : 'Take a photo first.'); return; }
+  if (!shareButton.hidden) sharePhoto(); else downloadPhoto();
+});
 document.querySelectorAll('.upload-trigger').forEach(button => button.addEventListener('click', () => document.querySelector('#uploadPhoto').click()));
 shareButton.addEventListener('click', sharePhoto);
 document.querySelector('#flipCamera').addEventListener('click', flipCamera);
