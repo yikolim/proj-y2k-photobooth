@@ -42,47 +42,51 @@ let state = {
   running: false,
   counting: false
 };
-let selectedSlot = 0;
 const drafts = new Map();
 let liveFit = { zoom:1, x:0, y:0 };
-const slotSurface = document.createElement('canvas');
-const slotContext = slotSurface.getContext('2d', { willReadFrequently:true });
+// One camera frame feeds every slot: slot i gets vertical strip i of N, so two
+// (or three) people standing side by side each land in their own cutout.
+const frameSurface = document.createElement('canvas');
+const frameContext = frameSurface.getContext('2d', { willReadFrequently:true });
 const currentArt = () => artworkTemplates[state.template];
 const requiredShots = () => currentArt()?.slots.length || (state.template === 'fourcut' ? 4 : 1);
 const filledShots = () => state.shots.slice(0, requiredShots()).filter(Boolean).length;
 const complete = () => filledShots() === requiredShots();
-const selectedFit = () => state.shots[selectedSlot]?.fit || liveFit;
+const selectedFit = () => state.shots[0]?.fit || liveFit;
 
 function renderArtwork(guides) {
   const art = currentArt();
   if (!art.image.complete || !art.image.naturalWidth) return;
   ctx.drawImage(art.image, 0, 0, canvas.width, canvas.height);
+  const source = state.shots[0]?.image || getLiveSource();
+  const sw = source && (source.videoWidth || source.naturalWidth || source.width);
+  const sh = source && (source.videoHeight || source.naturalHeight || source.height);
+  if (source && sw && sh) {
+    if (frameSurface.width !== sw || frameSurface.height !== sh) { frameSurface.width = sw; frameSurface.height = sh; }
+    // Mirror + filter once in a separate surface so Safari's pixel fallback respects the cutouts.
+    drawMedia(frameContext, source, 0, 0, sw, sh);
+  }
+  const count = art.slots.length;
+  const fit = selectedFit();
   art.slots.forEach((slot, index) => {
     const [x,y,w,h] = slot.box;
-    if (slotSurface.width !== w || slotSurface.height !== h) { slotSurface.width = w; slotSurface.height = h; }
-    const shot = state.shots[index];
-    const source = shot?.image || (index === selectedSlot ? getLiveSource() : null);
-    slotContext.clearRect(0,0,w,h);
-    if (source) {
-      const fit = shot?.fit || liveFit;
-      const sw = source.videoWidth || source.naturalWidth || source.width;
-      const sh = source.videoHeight || source.naturalHeight || source.height;
-      const scale = Math.max(w/sw,h/sh) * fit.zoom;
-      const dw = sw * scale, dh = sh * scale;
-      const dx = (w-dw)/2 + fit.x * (dw-w)/2;
-      const dy = (h-dh)/2 + fit.y * (dh-h)/2;
-      // Filter in a separate surface so Safari's pixel fallback respects the cutout.
-      drawMedia(slotContext, source, dx,dy,dw,dh);
-    } else { slotContext.fillStyle='#eaeaea'; slotContext.fillRect(0,0,w,h); }
     ctx.save();
     ctx.clip(slot.clip);
-    ctx.drawImage(slotSurface,x,y,w,h);
-    if (!source && guides) {
-      ctx.fillStyle='#555'; ctx.font=`600 ${Math.round(w*.1)}px Manrope, sans-serif`;
-      ctx.textAlign='center'; ctx.fillText(`PHOTO ${index+1}`,x+w/2,y+h/2); ctx.textAlign='left';
+    if (source && sw && sh) {
+      const stripW = sw / count, stripX = stripW * index;
+      const scale = Math.max(w/stripW, h/sh) * fit.zoom;
+      const dw = stripW * scale, dh = sh * scale;
+      const dx = x + (w-dw)/2 + fit.x * (dw-w)/2;
+      const dy = y + (h-dh)/2 + fit.y * (dh-h)/2;
+      ctx.drawImage(frameSurface, stripX, 0, stripW, sh, dx, dy, dw, dh);
+    } else {
+      ctx.fillStyle='#eaeaea'; ctx.fillRect(x,y,w,h);
+      if (guides) {
+        ctx.fillStyle='#555'; ctx.font=`600 ${Math.round(w*.1)}px Manrope, sans-serif`;
+        ctx.textAlign='center'; ctx.fillText(count > 1 ? `FACE ${index+1}` : 'YOUR FACE',x+w/2,y+h/2); ctx.textAlign='left';
+      }
     }
     ctx.restore();
-    if (guides && index === selectedSlot) { ctx.save(); ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=3; ctx.setLineDash([9,9]); ctx.stroke(slot.clip); ctx.restore(); }
   });
 }
 
@@ -331,10 +335,8 @@ function captureCurrentSource() {
   drawMedia(captureCtx, source, 0, 0, capture.width, capture.height, 'none');
   const shot = { url: capture.toDataURL('image/jpeg', .94), image: capture, fit:{...liveFit} };
   if (currentArt()) {
-    state.shots[selectedSlot] = shot;
-    const next = currentArt().slots.findIndex((_,i) => !state.shots[i]);
-    if (next >= 0) selectedSlot = next;
-    liveFit = { zoom:1,x:0,y:0 };
+    // One press fills every cutout from the same frame.
+    state.shots = currentArt().slots.map(() => shot);
   } else if (state.template === 'fourcut') {
     if (state.shots.length >= 4) state.shots.shift();
     state.shots.push(shot);
@@ -342,7 +344,7 @@ function captureCurrentSource() {
     state.shots = [shot];
   }
   updateShots();
-  showToast(complete() ? 'Your template is ready to save.' : `Photo saved. Fill photo ${selectedSlot+1} next.`);
+  showToast(complete() ? 'Your template is ready to save.' : `Photo saved. ${requiredShots()-filledShots()} to go.`);
   if (complete()) togglePanel(true);
 }
 
@@ -356,13 +358,12 @@ function updateShots() {
   });
   const required = requiredShots();
   shotCount.textContent = `${filledShots()} / ${required}`;
-  frameCounter.textContent = currentArt() ? `PHOTO ${selectedSlot+1} / ${required}` : `${filledShots()} / ${required} CAPTURED`;
+  frameCounter.textContent = currentArt() ? (complete() ? 'READY TO SAVE' : `${required} FACE${required>1?'S':''} · ONE SHOT`) : `${filledShots()} / ${required} CAPTURED`;
   downloadButton.disabled = true;
   document.querySelector('#artworkTools').hidden = !currentArt();
   document.querySelector('#photoAdjustment').hidden = !currentArt();
   canvasWrap.classList.toggle('artwork-preview', !!currentArt());
   cameraEmpty.classList.toggle('hidden', !!currentArt() || !!getLiveSource());
-  document.querySelector('#slotButtons').innerHTML = currentArt() ? currentArt().slots.map((_,i)=>`<button data-slot="${i}" aria-pressed="${i===selectedSlot}">Photo ${i+1}${state.shots[i]?' ✓':''}</button>`).join('') : '';
   const fit = selectedFit();
   document.querySelector('#photoZoom').value=fit.zoom;
   document.querySelector('#photoX').value=fit.x;
@@ -411,7 +412,6 @@ function selectTemplate(button) {
   drafts.set(state.template, state.shots);
   state.template = button.dataset.template;
   state.shots = drafts.get(state.template) || [];
-  selectedSlot = 0;
   liveFit = {zoom:1,x:0,y:0};
   document.querySelectorAll('[data-template]').forEach(item => { item.classList.toggle('active',item.dataset.template===state.template); item.setAttribute('aria-pressed',String(item.dataset.template===state.template)); });
   resizeCanvas();
@@ -442,7 +442,6 @@ function resetAll() {
   state.extra = 'none';
   state.shots = [];
   drafts.set(state.template, []);
-  selectedSlot=0;
   liveFit={zoom:1,x:0,y:0};
   document.querySelectorAll('#filterList button').forEach(button => button.classList.toggle('active', button.dataset.filter === 'clean'));
   document.querySelectorAll('#extraList button').forEach(button => button.classList.toggle('active', button.dataset.extra === 'none'));
@@ -465,27 +464,19 @@ document.querySelector('#artworkGallery').innerHTML = Object.entries(artworkTemp
 document.querySelector('#artworkGallery').addEventListener('click', event => {
   const button=event.target.closest('[data-template]'); if(button) selectTemplate(button);
 });
-document.querySelector('#slotButtons').addEventListener('click', event => {
-  const button=event.target.closest('[data-slot]'); if(button && !state.counting) { selectedSlot=Number(button.dataset.slot); updateShots(); }
-});
 for (const [id,key] of [['photoZoom','zoom'],['photoX','x'],['photoY','y']]) {
   document.getElementById(id).addEventListener('input',event => { selectedFit()[key]=Number(event.target.value); prepareExport(); });
 }
-document.querySelector('#clearSlot').addEventListener('click', () => { if(state.counting)return; state.shots[selectedSlot]=null; updateShots(); });
+document.querySelector('#clearSlot').addEventListener('click', () => { if(state.counting)return; state.shots=[]; updateShots(); });
 document.querySelector('#resetFit').addEventListener('click', () => { Object.assign(selectedFit(),{zoom:1,x:0,y:0}); updateShots(); });
 function togglePanel(force) {
   const panel = document.querySelector('.control-panel');
   const expanded = typeof force === 'boolean' ? force : !panel.classList.contains('expanded');
   panel.classList.toggle('expanded', expanded);
-  document.querySelector('#panelToggle').setAttribute('aria-expanded', String(expanded));
-  document.querySelector('#panelToggle').setAttribute('aria-label', expanded ? 'Collapse booth settings' : 'Expand booth settings');
-  document.querySelector('#panelToggle').textContent = expanded ? '−' : '＋';
+  document.querySelector('#panelOpen').setAttribute('aria-expanded', String(expanded));
 }
-document.querySelector('#panelToggle').addEventListener('click', () => togglePanel());
-document.querySelector('#settingsShortcut').addEventListener('click', () => {
-  togglePanel();
-  if (!matchMedia('(max-width:600px)').matches) document.querySelector('#templateGrid button').focus();
-});
+// The whole "Select templates" bar is the tap target on phones.
+document.querySelector('#panelOpen').addEventListener('click', () => togglePanel());
 document.querySelectorAll('.upload-trigger').forEach(button => button.addEventListener('click', () => document.querySelector('#uploadPhoto').click()));
 shareButton.addEventListener('click', sharePhoto);
 document.querySelector('#flipCamera').addEventListener('click', flipCamera);
@@ -505,7 +496,7 @@ document.querySelector('#extraList').addEventListener('click', event => {
 });
 document.querySelector('#shots').addEventListener('click', event => {
   const button = event.target.closest('.shot');
-  if (button && !state.counting) { if(currentArt()){selectedSlot=Number(button.dataset.index);updateShots();}else removeShot(Number(button.dataset.index)); }
+  if (button && !state.counting) { if(currentArt()){state.shots=[];updateShots();showToast('Cleared. Take the shot again.');}else removeShot(Number(button.dataset.index)); }
 });
 document.querySelector('#resetAll').addEventListener('click', resetAll);
 document.querySelector('#downloadButton').addEventListener('click', downloadPhoto);
