@@ -172,3 +172,35 @@ body::before,body::after { display:none; }
   .canvas-wrap:has(.camera-empty:not(.hidden)) { min-height:300px; }
   #slotHint { font-size:11px; }
 }
+
+/* Smaller wordmark; the settings sheet header is one tappable "Select templates" bar. */
+.site-header { grid-template-columns:1fr auto; }
+.brand { font-size:22px; padding:6px 20px 8px; letter-spacing:.2em; }
+.brand small { font-size:7px; letter-spacing:.3em; }
+.panel-heading { align-items:center; gap:12px; }
+.panel-open { flex:1; min-width:0; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:0; border:0; background:transparent; color:inherit; cursor:default; text-align:left; }
+.panel-open h2 { margin:0; font-size:22px; letter-spacing:-.04em; }
+.panel-chevron { display:none; }
+#slotHint { color:#666; font-size:10px; margin:8px auto 14px; max-width:320px; line-height:1.4; }
+@media(max-width:600px) {
+  .site-header { height:calc(60px + env(safe-area-inset-top)); padding:calc(10px + env(safe-area-inset-top)) 16px 10px; grid-template-columns:1fr; }
+  .brand { font-size:18px; width:auto; justify-self:center; padding:5px 18px 7px; }
+  .brand small { font-size:6px; margin-top:3px; }
+  .stage-shell, .stage-shell:has(.artwork-preview) { min-height:calc(100svh - 150px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+  .panel-open { cursor:pointer; min-height:44px; }
+  .panel-open h2 { font-size:18px; }
+  .panel-chevron { display:block; flex-shrink:0; width:10px; height:10px; margin-right:6px; border-right:2px solid #111; border-bottom:2px solid #111; transform:rotate(-135deg); transition:transform .2s; }
+  .control-panel.expanded .panel-chevron { transform:rotate(45deg); margin-top:-4px; }
+  .control-panel.expanded .panel-heading { padding-bottom:12px; border-bottom:1px solid #ddd; margin-bottom:4px; }
+}
+
+/* Save lives under the stage; the phone overlay is template selection only. */
+.save-row { width:min(100%,440px); margin:14px auto 0; }
+.save-row .download-button { border-radius:9px; }
+@media(max-width:600px) {
+  .control-panel.expanded > .control-group:not(#templateGroup), .control-panel.expanded > .shots-wrap { display:none !important; }
+  .control-panel .basic-label { margin-top:14px; }
+  .save-row { margin-top:10px; }
+  .stage-shell, .stage-shell:has(.artwork-preview) { padding-bottom:96px; }
+}
+@media(max-width:600px) { #templateGroup { border-top:0; padding-top:4px; } #templateGroup > .control-title { display:none; } }

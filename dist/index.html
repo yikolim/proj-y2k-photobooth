@@ -21,7 +21,6 @@
         <span>Y2K<small>PHOTOBOOTH</small></span>
       </a>
       <div class="privacy-note"><span class="privacy-dot"></span> Photos stay on this device</div>
-      <button class="header-link" id="settingsShortcut" aria-label="Open booth settings">＋</button>
     </header>
 
     <main>
@@ -62,27 +61,32 @@
             <button class="icon-button upload-trigger" aria-label="Upload photo" title="Upload photo">↥</button>
           </div>
           <div id="artworkTools" hidden>
-            <div class="slot-buttons" id="slotButtons"></div>
             <button class="text-button" id="enableCamera">Start camera</button>
-            <p id="slotHint">Choose a slot, then take or upload a photo.</p>
+            <p id="slotHint">Line up side by side so each face lands in its spot, then take one shot.</p>
           </div>
           <div class="stage-caption">
             <span id="statusText">CAMERA OFF</span>
             <span id="templateLabel">PORTRAIT · 3:4</span>
           </div>
+          <div class="save-row" id="saveRow">
+            <button class="download-button" id="downloadButton" disabled>
+              <span>Save your photo</span><span>↓</span>
+            </button>
+            <button class="download-button share-button" id="shareButton" hidden disabled>Save to Photos / Share ↑</button>
+            <p class="download-note" id="saveNote">Downloads as a high-quality PNG. Nothing gets uploaded.</p>
+          </div>
         </div>
 
         <aside class="control-panel">
           <div class="panel-heading">
-            <div>
-              <p class="eyebrow">YOUR PERSONAL PHOTO STUDIO</p>
-              <h2>THE BOOTH</h2>
-            </div>
+            <button class="panel-open" id="panelOpen" aria-expanded="false" aria-controls="panelBody">
+              <h2>Select templates</h2>
+              <span class="panel-chevron" aria-hidden="true"></span>
+            </button>
             <button class="text-button" id="resetAll">Reset</button>
-            <button class="panel-toggle" id="panelToggle" aria-expanded="false" aria-label="Expand booth settings">＋</button>
           </div>
 
-          <div class="control-group">
+          <div class="control-group" id="templateGroup">
             <div class="control-title"><span>01</span><h3>Choose a template</h3></div>
             <div class="artwork-gallery" id="artworkGallery"></div>
             <p class="basic-label">Basic layouts</p>
@@ -118,11 +122,11 @@
           </div>
 
           <div class="control-group" id="photoAdjustment" hidden>
-            <div class="control-title"><h3>Fit your photo</h3></div>
+            <div class="control-title"><h3>Fit your faces</h3></div>
             <label class="fit-control">Zoom <input id="photoZoom" type="range" min="1" max="3" step="0.01" value="1"></label>
             <label class="fit-control">Left / right <input id="photoX" type="range" min="-1" max="1" step="0.01" value="0"></label>
             <label class="fit-control">Up / down <input id="photoY" type="range" min="-1" max="1" step="0.01" value="0"></label>
-            <div class="fit-actions"><button class="text-button" id="clearSlot">Clear selected photo</button><button class="text-button" id="resetFit">Reset position</button></div>
+            <div class="fit-actions"><button class="text-button" id="clearSlot">Retake</button><button class="text-button" id="resetFit">Reset position</button></div>
           </div>
 
           <div class="control-group">
@@ -145,11 +149,6 @@
             </div>
           </div>
 
-          <button class="download-button" id="downloadButton" disabled>
-            <span>Save your photo</span><span>↓</span>
-          </button>
-          <button class="download-button share-button" id="shareButton" hidden disabled>Save to Photos / Share ↑</button>
-          <p class="download-note" id="saveNote">Downloads as a high-quality PNG. Nothing gets uploaded.</p>
         </aside>
       </section>
 
