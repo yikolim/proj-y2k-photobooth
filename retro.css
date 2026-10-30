@@ -131,3 +131,48 @@ button:focus-visible, label:focus-visible, a:focus-visible { outline: 1px dotted
   .toast { bottom: calc(60px + env(safe-area-inset-bottom)); }
 }
 @media (max-width: 600px) { .site-header { display: block; padding: 0; height: auto; } .site-header .brand { width: 100%; justify-self: stretch; font-size: 15px; } }
+
+/* ---- Phone-shaped window at every size: toolbar, big preview, template strip, Filter/Save tabs ---- */
+@media (min-width: 601px) { body { max-width: 480px; } }
+.privacy-note { display: none; }
+.booth { display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 0; min-height: 0; }
+.control-panel, .bottom-tabs { width: auto; align-self: stretch; }
+.stage-shell, .stage-shell:has(.artwork-preview) { display: flex; flex-direction: column; height: auto; min-height: 0; padding: 0; justify-content: flex-start; }
+.stage-topline, .stage-caption, .save-row, .panel-heading { display: none !important; }
+/* Capture controls become the toolbar above the preview. */
+.capture-row { order: -1; height: 46px; gap: 0; justify-content: space-between; padding: 4px 6px; border-bottom: 1px solid var(--shade); box-shadow: 0 1px var(--hi); }
+.icon-button { width: 56px; height: 30px; border-radius: 0; font-size: 18px; }
+.shutter { width: 38px; height: 38px; padding: 3px; }
+.canvas-wrap, .canvas-wrap:has(.camera-empty:not(.hidden)), .artwork-preview { flex: none; width: auto; margin: 6px 6px 0; max-height: none; aspect-ratio: auto !important; height: min(52svh, 480px); background: #fff; }
+#preview { object-fit: contain; }
+.canvas-wrap:has(.camera-empty:not(.hidden)) { min-height: 0; }
+/* Template strip: names above thumbnails, scrolls sideways. */
+.control-panel, .control-panel.expanded { position: static; margin: 6px 6px 0; max-height: none; overflow: hidden; border-color: var(--sunken-colors); box-shadow: var(--sunken-shadow); background: var(--face); }
+.control-panel > * { display: none !important; }
+.control-panel > #templateGroup { display: flex !important; }
+body.filters-open .control-panel > #templateGroup { display: none !important; }
+body.filters-open .control-panel > .control-group:has(#filterList) { display: flex !important; }
+.control-panel > .control-group { gap: 10px; align-items: flex-start; padding: 8px 6px 4px; border: 0; box-shadow: none; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: auto; }
+.control-panel > .control-group::-webkit-scrollbar { height: 16px; }
+.control-panel > .control-group::-webkit-scrollbar-track { background: repeating-conic-gradient(var(--hi) 0 25%, var(--face) 0 50%) 0 0 / 2px 2px; }
+.control-panel > .control-group::-webkit-scrollbar-thumb { background: var(--face); border: var(--raised-border); border-color: var(--raised-colors); box-shadow: var(--raised-shadow); }
+.control-panel .control-title, .control-panel .basic-label { display: none; }
+.artwork-gallery, .template-grid { display: flex; flex-wrap: nowrap; gap: 8px; }
+.artwork-card, .template-card { flex: none; width: 104px; min-height: 0; padding: 0; border: 0; box-shadow: none; background: transparent; display: flex; flex-direction: column-reverse; align-items: stretch; justify-content: flex-start; }
+.artwork-card img, .template-card .template-icon { display: block; width: 100%; height: 86px; margin: 0 auto; object-fit: contain; border: var(--raised-border); border-color: var(--sunken-colors); box-shadow: var(--sunken-shadow); background: #fff; }
+.template-card .template-icon { box-sizing: border-box; padding: 0; background: #fff; }
+.template-card .template-icon i { display: none; }
+.artwork-card span, .template-card strong { display: block; order: 2; margin: 0 0 4px; font: 400 14px/1 "Pixelify Sans", sans-serif; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.artwork-card small, .template-card small { display: none; }
+.artwork-card.active, .template-card.active { padding: 0; border: 0; box-shadow: none; background: transparent; }
+.artwork-card.active span, .template-card.active strong { font-weight: 700; }
+.artwork-card.active img, .template-card.active .template-icon { outline: 2px solid var(--title-a); outline-offset: -2px; }
+.template-card:hover { transform: none; background: transparent; }
+.filter-list { flex-wrap: nowrap; gap: 8px; padding-bottom: 4px; }
+.filter-chip { flex: none; }
+/* Bottom tabs */
+.bottom-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 6px; }
+.bottom-tabs button { min-height: 40px; font: 700 16px "Pixelify Sans", sans-serif; color: #000; border: var(--raised-border); border-color: var(--raised-colors); box-shadow: var(--raised-shadow); background: var(--face); cursor: pointer; }
+.bottom-tabs button:active, .bottom-tabs button[aria-pressed="true"] { border-color: var(--sunken-colors); box-shadow: var(--sunken-shadow); background: var(--face) repeating-conic-gradient(var(--hi) 0 25%, transparent 0 50%) 0 0 / 4px 4px; }
+.toast { bottom: calc(64px + env(safe-area-inset-bottom)); }
+@media (max-width: 600px) { .control-panel { left: auto; right: auto; bottom: auto; border-bottom: var(--raised-border); border-bottom-color: var(--hi); } }
