@@ -1,0 +1,133 @@
+/* Y2K "Photobooth.exe": a Windows 98 window on a teal desktop. Loaded last, so
+   it overrides the neutral presentation in icy.css selector-for-selector. */
+:root {
+  --face: #c0c0c0; --hi: #ffffff; --lite: #dfdfdf; --shade: #808080; --dark: #000000;
+  --title-a: #000080; --title-b: #1084d0; --desk: #008080; --sea: #2060e0;
+  --paper: var(--face); --ink: #000; --muted: #444; --line: var(--shade); --acid: #000080; --pink: #000080; --cream: #fff;
+  --raised-border: 2px solid; --raised-colors: var(--hi) var(--dark) var(--dark) var(--hi);
+  --raised-shadow: inset -1px -1px var(--shade), inset 1px 1px var(--lite);
+  --sunken-colors: var(--shade) var(--hi) var(--hi) var(--shade);
+  --sunken-shadow: inset 1px 1px var(--dark), inset -1px -1px var(--lite);
+}
+
+html { background: var(--desk); }
+body { background: var(--face); color: #000; font-family: "Pixelify Sans", Tahoma, "MS Sans Serif", sans-serif; -webkit-font-smoothing: none; font-smooth: never; }
+button, input, .text-button { font-family: inherit; }
+button:focus-visible, label:focus-visible, a:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+
+/* ---- Window chrome ---- */
+.site-header { height: auto; min-height: 0; padding: 0; display: block; border: 0; background: var(--face); }
+.site-header .brand { display: flex; width: auto; align-items: center; justify-content: flex-start; gap: 8px; margin: 0; padding: 4px 6px; border: 0; border-radius: 0; box-shadow: none; background: linear-gradient(90deg, var(--title-a), var(--title-b)); color: #fff; font-size: 17px; font-weight: 700; letter-spacing: 0; line-height: 1; flex-direction: row; }
+.brand-mark { display: grid !important; width: 16px; height: 16px; gap: 1px; transform: none; border: 1px solid #fff; padding: 2px; background: #fff; }
+.brand-mark span { border-radius: 0; }
+.brand-mark span:nth-child(1) { background: var(--title-a); } .brand-mark span:nth-child(2) { background: #e0004d; }
+.brand-mark span:nth-child(3) { background: #ffd500; } .brand-mark span:nth-child(4) { background: #00a650; }
+.brand > span:not(.brand-mark) { display: inline; }
+.brand small { display: inline; font: inherit; letter-spacing: 0; margin: 0; }
+.brand small::before { content: " "; } .brand small::after { content: ".exe"; }
+.win-controls { margin-left: auto; display: flex; gap: 2px; }
+.win-controls i { display: grid; place-items: center; width: 18px; height: 16px; font: 700 11px/1 "Pixelify Sans", sans-serif; font-style: normal; color: #000; background: var(--face); border: var(--raised-border); border-color: var(--raised-colors); box-shadow: var(--raised-shadow); }
+.menubar { display: flex; gap: 14px; padding: 4px 8px 5px; font-size: 15px; border-bottom: 1px solid var(--shade); box-shadow: 0 1px var(--hi); }
+.menubar u { text-decoration: underline; }
+.privacy-note { display: block; padding: 5px 8px 4px; font: 400 15px/1 "VT323", monospace; letter-spacing: 0; text-transform: none; color: #000; }
+.privacy-dot { width: 8px; height: 8px; border-radius: 0; background: #00a650; box-shadow: none; border: 1px solid #000; }
+
+/* ---- Stage ---- */
+.booth { gap: 10px; padding: 8px 8px 16px; }
+.stage-shell { padding: 8px; border: 0; background: transparent; }
+.stage-topline, .stage-caption { font: 400 14px/1 "VT323", monospace; letter-spacing: 0; color: #000; opacity: 1; width: 100%; }
+.stage-topline { border: 0; padding: 0 2px 6px; }
+.canvas-wrap, .canvas-wrap:has(.camera-empty:not(.hidden)), .artwork-preview { border-radius: 0; border: var(--raised-border); border-color: var(--sunken-colors); box-shadow: var(--sunken-shadow); background: var(--sea); overflow: hidden; }
+.camera-empty { color: #fff; background: var(--sea) radial-gradient(#fff 1px, transparent 1.3px) 0 0 / 9px 9px; }
+.camera-empty h2 { font-size: 26px; font-weight: 700; letter-spacing: 0; text-shadow: 2px 2px #000; }
+.camera-empty p { color: #fff; font: 400 17px/1.2 "VT323", monospace; text-shadow: 1px 1px #000; }
+.empty-icon { width: 92px; height: 66px; border-radius: 0; border: var(--raised-border); border-color: var(--raised-colors); box-shadow: var(--raised-shadow); background: var(--face); transform: none; }
+.empty-icon::before { display: block; width: 30px; height: 10px; top: -12px; border: 2px solid #000; border-bottom: 0; border-radius: 0; background: var(--face); }
+.lens { width: 34px; height: 34px; border: 2px solid #000; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #9ad 0, #124 60%); box-shadow: none; }
+.countdown { font-family: "Pixelify Sans", sans-serif; text-shadow: 4px 4px #000; }
+
+/* ---- Buttons: raised bevels, sunken when active ---- */
+.button, .icon-button, .download-button, .share-button, .text-button, .artwork-card, .template-card, .filter-chip, .extra-chip, .slot-buttons button, .panel-open, .shot {
+  border: var(--raised-border); border-color: var(--raised-colors); box-shadow: var(--raised-shadow); background: var(--face); color: #000; border-radius: 0; font-weight: 400; backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.button:active, .icon-button:active, .download-button:active:not(:disabled), .text-button:active, .artwork-card:active, .template-card:active, .filter-chip:active, .extra-chip:active, .shutter:active, .panel-open:active {
+  border-color: var(--sunken-colors); box-shadow: var(--sunken-shadow);
+}
+.button { min-height: 32px; padding: 6px 16px; font-size: 16px; }
+.button-dark, .button-light { background: var(--face); color: #000; }
+.capture-row { gap: 22px; }
+.icon-button { width: 44px; height: 44px; font-size: 22px; }
+.shutter { width: 64px; height: 64px; padding: 5px; border-radius: 50%; border: 2px solid #000; background: var(--face); box-shadow: inset 2px 2px var(--hi), inset -2px -2px var(--shade); }
+.shutter span { background: #e0004d; border: 2px solid #000; box-shadow: inset 2px 2px #ff6b9a; }
+.text-button { min-height: 28px; padding: 2px 10px; font: 400 15px "Pixelify Sans", sans-serif; text-decoration: none; }
+#slotHint { color: #000; font: 400 15px/1.25 "VT323", monospace; }
+.save-row { margin-top: 10px; }
+.download-button, .share-button { min-height: 40px; justify-content: center; gap: 10px; font-size: 17px; font-weight: 700; text-transform: none; border-radius: 0; }
+.download-button:hover:not(:disabled), .share-button:hover:not(:disabled) { background: var(--face); color: #000; }
+.download-button:disabled { background: var(--face); color: var(--shade); text-shadow: 1px 1px var(--hi); }
+.download-note { color: #000; font: 400 14px/1.3 "VT323", monospace; }
+.toast { border-radius: 0; background: var(--face); color: #000; border: var(--raised-border); border-color: var(--raised-colors); box-shadow: var(--raised-shadow), 4px 4px 0 rgba(0,0,0,.35); font: 400 15px/1.3 "VT323", monospace; }
+
+/* ---- Settings window ---- */
+.control-panel, .control-panel.expanded { padding: 0; border-radius: 0; border: var(--raised-border); border-color: var(--raised-colors); box-shadow: var(--raised-shadow); background: var(--face); backdrop-filter: none; -webkit-backdrop-filter: none; }
+.panel-heading { padding: 0; gap: 0; align-items: stretch; }
+.panel-open { flex: 1; min-height: 28px; padding: 3px 6px; border: 0; box-shadow: none; background: linear-gradient(90deg, var(--title-a), var(--title-b)); color: #fff; }
+.panel-open:active { border: 0; box-shadow: none; }
+.panel-open h2 { font-size: 16px; font-weight: 700; letter-spacing: 0; color: #fff; }
+.panel-chevron { display: block; width: 18px; height: 16px; margin: 0; border: var(--raised-border); border-color: var(--raised-colors); box-shadow: var(--raised-shadow); background: var(--face); transform: none !important; position: relative; }
+.panel-chevron::after { content: "▴"; position: absolute; inset: 0; display: grid; place-items: center; color: #000; font-size: 11px; line-height: 1; }
+.control-panel.expanded .panel-chevron::after { content: "▾"; }
+.control-panel.expanded .panel-heading { border: 0; margin: 0; padding: 0; }
+.panel-heading .text-button { margin: 0; min-width: 0; border-left: 0; align-self: stretch; border-top: 0; border-bottom: 0; }
+.control-group, .shots-wrap { padding: 10px 10px 12px; border-top: 1px solid var(--shade); box-shadow: inset 0 1px var(--hi); }
+#templateGroup { border-top: 0; box-shadow: none; }
+.control-title { margin-bottom: 8px; }
+.control-title span { font: 400 14px "VT323", monospace; color: #000; }
+.control-title h3 { font-size: 15px; font-weight: 400; text-transform: none; letter-spacing: 0; }
+.artwork-gallery { gap: 6px; }
+.artwork-card { padding: 3px 3px 5px; }
+.artwork-card img { border-radius: 0; border: 1px solid var(--shade); background: var(--hi); image-rendering: pixelated; }
+.artwork-card span { font-size: 13px; font-weight: 400; margin-top: 4px; }
+.artwork-card small { font: 400 13px "VT323", monospace; color: #000; margin-top: 1px; }
+.artwork-card.active, .template-card.active, .filter-chip.active, .extra-chip.active {
+  padding: 3px 3px 5px; border: var(--raised-border); border-color: var(--sunken-colors); box-shadow: var(--sunken-shadow); color: #000;
+  background: var(--face) repeating-conic-gradient(var(--hi) 0 25%, transparent 0 50%) 0 0 / 4px 4px;
+}
+.template-card.active { padding: 12px 6px 10px; }
+.filter-chip.active, .extra-chip.active { padding: 6px 12px 6px 7px; }
+.extra-chip.active { padding-left: 12px; }
+.basic-label { font: 400 15px "VT323", monospace; color: #000; margin: 12px 0 6px; }
+.template-card { border-radius: 0; }
+.template-card strong { font-size: 13px; font-weight: 400; }
+.template-card small { font: 400 13px "VT323", monospace; color: #000; }
+.template-icon { background: var(--hi); border-color: #000; }
+.filter-chip, .extra-chip { border-radius: 0; font-size: 14px; }
+.swatch { border-radius: 0; border: 1px solid #000; filter: none; }
+.fit-control { font-size: 14px; }
+.fit-control input { accent-color: var(--title-a); }
+.shots-head { font: 400 14px "VT323", monospace; }
+.shot { border-style: solid; border-color: var(--sunken-colors); box-shadow: var(--sunken-shadow); background: var(--hi); }
+.shot span { font: 400 14px "VT323", monospace; color: var(--shade); }
+.shot:not(.empty):hover:after { background: rgba(0,0,128,.6); font-family: "Pixelify Sans", sans-serif; }
+.control-panel { scrollbar-width: auto; scrollbar-color: var(--face) var(--lite); }
+.control-panel::-webkit-scrollbar { width: 16px; }
+.control-panel::-webkit-scrollbar-track { background: repeating-conic-gradient(var(--hi) 0 25%, var(--face) 0 50%) 0 0 / 2px 2px; }
+.control-panel::-webkit-scrollbar-thumb { background: var(--face); border: var(--raised-border); border-color: var(--raised-colors); box-shadow: var(--raised-shadow); }
+
+/* ---- Desktop: the whole app is one window floating on the desktop ---- */
+@media (min-width: 601px) {
+  body { max-width: 1120px; margin: 24px auto; border: var(--raised-border); border-color: var(--raised-colors); box-shadow: var(--raised-shadow), 6px 6px 0 rgba(0,0,0,.35); min-height: 0; }
+  .site-header .brand { margin: 2px; }
+  .booth { min-height: 0; padding: 10px 10px 18px; gap: 14px; }
+  .control-panel { max-height: none; overflow: visible; }
+  .panel-open { cursor: default; }
+  .panel-chevron, .panel-chevron::after { display: none; }
+}
+@media (max-width: 600px) {
+  .site-header .brand { padding: 4px 4px; }
+  .stage-shell, .stage-shell:has(.artwork-preview) { padding: 6px 8px 0; }
+  .control-panel { left: 0; right: 0; bottom: 0; border-bottom: 0; }
+  .control-panel.expanded .panel-heading { position: sticky; top: 0; z-index: 1; background: var(--face); }
+  .toast { bottom: calc(60px + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 600px) { .site-header { display: block; padding: 0; height: auto; } .site-header .brand { width: 100%; justify-self: stretch; font-size: 15px; } }
