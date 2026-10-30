@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#ffffff" />
-    <meta name="description" content="Loop Booth is a private, playful browser photobooth with live filters and social-ready templates." />
-    <title>Loop Booth — make a moment</title>
+    <meta name="description" content="Y2K Photobooth is a private, playful browser photobooth with live filters and social-ready templates." />
+    <title>Y2K Photobooth</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -14,11 +14,11 @@
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="#" aria-label="Loop Booth home">
+      <a class="brand" href="#" aria-label="Y2K Photobooth home">
         <span class="brand-mark" aria-hidden="true">
           <span></span><span></span><span></span><span></span>
         </span>
-        <span>LOOP</span>
+        <span>Y2K<small>PHOTOBOOTH</small></span>
       </a>
       <div class="privacy-note"><span class="privacy-dot"></span> Photos stay on this device</div>
       <button class="header-link" id="settingsShortcut" aria-label="Open booth settings">＋</button>
@@ -61,6 +61,11 @@
             </button>
             <button class="icon-button upload-trigger" aria-label="Upload photo" title="Upload photo">↥</button>
           </div>
+          <div id="artworkTools" hidden>
+            <div class="slot-buttons" id="slotButtons"></div>
+            <button class="text-button" id="enableCamera">Start camera</button>
+            <p id="slotHint">Choose a slot, then take or upload a photo.</p>
+          </div>
           <div class="stage-caption">
             <span id="statusText">CAMERA OFF</span>
             <span id="templateLabel">PORTRAIT · 3:4</span>
@@ -78,7 +83,9 @@
           </div>
 
           <div class="control-group">
-            <div class="control-title"><span>01</span><h3>Choose a frame</h3></div>
+            <div class="control-title"><span>01</span><h3>Choose a template</h3></div>
+            <div class="artwork-gallery" id="artworkGallery"></div>
+            <p class="basic-label">Basic layouts</p>
             <div class="template-grid" id="templateGrid">
               <button class="template-card active" data-template="portrait">
                 <span class="template-icon portrait-icon"></span>
@@ -108,6 +115,14 @@
               <button class="filter-chip" data-filter="mono"><span class="swatch swatch-mono"></span>Mono</button>
               <button class="filter-chip" data-filter="citrus"><span class="swatch swatch-citrus"></span>Citrus</button>
             </div>
+          </div>
+
+          <div class="control-group" id="photoAdjustment" hidden>
+            <div class="control-title"><h3>Fit your photo</h3></div>
+            <label class="fit-control">Zoom <input id="photoZoom" type="range" min="1" max="3" step="0.01" value="1"></label>
+            <label class="fit-control">Left / right <input id="photoX" type="range" min="-1" max="1" step="0.01" value="0"></label>
+            <label class="fit-control">Up / down <input id="photoY" type="range" min="-1" max="1" step="0.01" value="0"></label>
+            <div class="fit-actions"><button class="text-button" id="clearSlot">Clear selected photo</button><button class="text-button" id="resetFit">Reset position</button></div>
           </div>
 
           <div class="control-group">
@@ -150,12 +165,13 @@
     </main>
 
     <footer>
-      <div class="brand footer-brand"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span>LOOP BOOTH</span></div>
+      <div class="brand footer-brand"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span>Y2K PHOTOBOOTH</span></div>
       <p>Made for little moments and big personalities.</p>
       <p class="mono">© 2026 · PHOTOS NEVER LEAVE YOUR DEVICE</p>
     </footer>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./templates.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>
