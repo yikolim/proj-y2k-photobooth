@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4f0e8" />
+    <meta name="description" content="Loop Booth is a private, playful browser photobooth with live filters and social-ready templates." />
+    <title>Loop Booth — make a moment</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#" aria-label="Loop Booth home">
+        <span class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </span>
+        <span>LOOP BOOTH</span>
+      </a>
+      <div class="privacy-note"><span class="privacy-dot"></span> Photos stay on this device</div>
+      <a class="header-link" href="#how-it-works">How it works <span>↘</span></a>
+    </header>
+
+    <main>
+      <section class="hero-copy" aria-labelledby="page-title">
+        <p class="eyebrow">YOUR POCKET PHOTO STUDIO</p>
+        <h1 id="page-title">Make a moment.<br /><em>Keep the feeling.</em></h1>
+        <p class="intro">Pick a frame, find your filter, and turn your camera roll into something worth keeping.</p>
+      </section>
+
+      <section class="booth" aria-label="Photo booth studio">
+        <div class="stage-shell">
+          <div class="stage-topline">
+            <span>LIVE PREVIEW</span>
+            <span id="frameCounter">FRAME 01 / 04</span>
+          </div>
+          <div class="canvas-wrap" id="canvasWrap">
+            <video id="camera" autoplay playsinline muted></video>
+            <canvas id="preview" aria-label="Camera preview"></canvas>
+            <div class="camera-empty" id="cameraEmpty">
+              <div class="empty-icon">
+                <span class="lens"></span>
+              </div>
+              <h2>Your camera, your canvas</h2>
+              <p>Start your camera or upload a favorite photo to begin.</p>
+              <div class="empty-actions">
+                <button class="button button-dark" id="startCamera">Start camera</button>
+                <label class="button button-light" for="uploadPhoto">Upload photo</label>
+                <input id="uploadPhoto" type="file" accept="image/*" hidden />
+              </div>
+            </div>
+            <div class="countdown" id="countdown" aria-live="assertive"></div>
+          </div>
+          <div class="capture-row">
+            <button class="icon-button" id="flipCamera" aria-label="Flip camera" title="Flip camera">↻</button>
+            <button class="shutter" id="shutter" aria-label="Take photo">
+              <span></span>
+            </button>
+            <label class="icon-button" for="uploadPhoto" aria-label="Upload photo" title="Upload photo">↥</label>
+          </div>
+          <div class="stage-caption">
+            <span id="statusText">CAMERA OFF</span>
+            <span id="templateLabel">PORTRAIT · 3:4</span>
+          </div>
+        </div>
+
+        <aside class="control-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">MAKE IT YOURS</p>
+              <h2>Set the mood</h2>
+            </div>
+            <button class="text-button" id="resetAll">Reset</button>
+          </div>
+
+          <div class="control-group">
+            <div class="control-title"><span>01</span><h3>Choose a frame</h3></div>
+            <div class="template-grid" id="templateGrid">
+              <button class="template-card active" data-template="portrait">
+                <span class="template-icon portrait-icon"></span>
+                <strong>Portrait</strong><small>3:4</small>
+              </button>
+              <button class="template-card" data-template="story">
+                <span class="template-icon story-icon"></span>
+                <strong>Story</strong><small>9:16</small>
+              </button>
+              <button class="template-card" data-template="square">
+                <span class="template-icon square-icon"></span>
+                <strong>Square</strong><small>1:1</small>
+              </button>
+              <button class="template-card" data-template="fourcut">
+                <span class="template-icon four-icon"><i></i><i></i><i></i><i></i></span>
+                <strong>4 Cut</strong><small>4:5</small>
+              </button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-title"><span>02</span><h3>Find your filter</h3></div>
+            <div class="filter-list" id="filterList">
+              <button class="filter-chip active" data-filter="clean"><span class="swatch swatch-clean"></span>Clean</button>
+              <button class="filter-chip" data-filter="glow"><span class="swatch swatch-glow"></span>Glow</button>
+              <button class="filter-chip" data-filter="dusk"><span class="swatch swatch-dusk"></span>Dusk</button>
+              <button class="filter-chip" data-filter="mono"><span class="swatch swatch-mono"></span>Mono</button>
+              <button class="filter-chip" data-filter="citrus"><span class="swatch swatch-citrus"></span>Citrus</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-title"><span>03</span><h3>Add a little extra</h3></div>
+            <div class="extra-list" id="extraList">
+              <button class="extra-chip active" data-extra="none">None</button>
+              <button class="extra-chip" data-extra="sparkles">✦ Sparkles</button>
+              <button class="extra-chip" data-extra="hearts">♥ Hearts</button>
+              <button class="extra-chip" data-extra="stamp">Date stamp</button>
+            </div>
+          </div>
+
+          <div class="shots-wrap">
+            <div class="shots-head"><span>YOUR SHOTS</span><span id="shotCount">0 / 4</span></div>
+            <div class="shots" id="shots">
+              <button class="shot empty" data-index="0" aria-label="Empty shot one"><span>1</span></button>
+              <button class="shot empty" data-index="1" aria-label="Empty shot two"><span>2</span></button>
+              <button class="shot empty" data-index="2" aria-label="Empty shot three"><span>3</span></button>
+              <button class="shot empty" data-index="3" aria-label="Empty shot four"><span>4</span></button>
+            </div>
+          </div>
+
+          <button class="download-button" id="downloadButton" disabled>
+            <span>Save your photo</span><span>↓</span>
+          </button>
+          <p class="download-note">Downloads as a high-quality PNG. Nothing gets uploaded.</p>
+        </aside>
+      </section>
+
+      <section class="how" id="how-it-works">
+        <p class="eyebrow">NO APP. NO ACCOUNT. NO AWKWARD.</p>
+        <h2>Three tiny steps.<br /><em>One very good photo.</em></h2>
+        <ol>
+          <li><span>01</span><h3>Pick your setup</h3><p>Choose a social-ready frame and a filter that feels like you.</p></li>
+          <li><span>02</span><h3>Strike a pose</h3><p>Use either camera, upload a photo, or fill a classic four-cut strip.</p></li>
+          <li><span>03</span><h3>Keep it forever</h3><p>Download the final image straight to your device—private by design.</p></li>
+        </ol>
+      </section>
+    </main>
+
+    <footer>
+      <div class="brand footer-brand"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span>LOOP BOOTH</span></div>
+      <p>Made for little moments and big personalities.</p>
+      <p class="mono">© 2026 · PHOTOS NEVER LEAVE YOUR DEVICE</p>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>
