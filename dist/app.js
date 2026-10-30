@@ -10,6 +10,10 @@ const frameCounter = document.querySelector('#frameCounter');
 const shotCount = document.querySelector('#shotCount');
 const downloadButton = document.querySelector('#downloadButton');
 const toast = document.querySelector('#toast');
+const shareButton = document.querySelector('#shareButton');
+let exportFile = null;
+let exportRevision = 0;
+let cameraStarting = false;
 
 const templateConfig = {
   portrait: { width: 900, height: 1200, ratio: '3 / 4', label: 'PORTRAIT · 3:4' },
@@ -45,6 +49,7 @@ function resizeCanvas() {
     canvas.height = config.height;
   }
   canvasWrap.style.aspectRatio = config.ratio;
+  canvasWrap.style.setProperty('--phone-preview-width', `calc(48svh * ${config.width / config.height})`);
   templateLabel.textContent = config.label;
 }
 
@@ -57,7 +62,7 @@ function coverRect(sourceWidth, sourceHeight, x, y, width, height) {
 
 function getLiveSource() {
   if (state.sourceImage) return state.sourceImage;
-  if (video.readyState >= 2) return video;
+  if (state.stream?.active && video.readyState >= 2) return video;
   return null;
 }
 
@@ -80,6 +85,24 @@ function drawMedia(target, source, x, y, width, height, filter = filterConfig[st
   }
   target.drawImage(source, crop.sx, crop.sy, crop.sw, crop.sh, crop.dx, crop.dy, crop.dw, crop.dh);
   target.restore();
+  // Older Safari versions lack CanvasRenderingContext2D.filter.
+  if (!('filter' in CanvasRenderingContext2D.prototype) && filter !== 'none') {
+    const pixels = target.getImageData(x, y, width, height);
+    const data = pixels.data;
+    const settings = {
+      clean: [1, 1, 1, 0, 0], glow: [1.08, .94, 1.08, 5, -3],
+      dusk: [.88, 1.08, .85, 8, 12], mono: [1, 1.14, 0, 0, 0],
+      citrus: [1, 1.05, 1.32, 8, -8]
+    }[state.filter];
+    const [brightness, contrast, saturation, red, blue] = settings;
+    for (let i = 0; i < data.length; i += 4) {
+      const gray = .2126 * data[i] + .7152 * data[i + 1] + .0722 * data[i + 2];
+      for (let channel = 0; channel < 3; channel++) {
+        data[i + channel] = ((gray + (data[i + channel] - gray) * saturation) * brightness - 128) * contrast + 128 + (channel === 0 ? red : channel === 2 ? blue : 0);
+      }
+    }
+    target.putImageData(pixels, x, y);
+  }
 }
 
 function drawShot(target, imageData, x, y, width, height) {
@@ -126,7 +149,7 @@ function drawDecoration(target, width, height) {
   target.restore();
 }
 
-function renderFrame() {
+function renderFrame(loop = true) {
   resizeCanvas();
   const { width, height } = canvas;
   ctx.clearRect(0, 0, width, height);
@@ -155,22 +178,35 @@ function renderFrame() {
     ctx.textAlign = 'left';
   }
   drawDecoration(ctx, width, height);
-  requestAnimationFrame(renderFrame);
+  if (loop) setTimeout(() => requestAnimationFrame(() => {
+    if (!document.hidden) renderFrame();
+    else renderFrameLater();
+  }), 1000 / 24);
+}
+
+function renderFrameLater() {
+  setTimeout(() => document.hidden ? renderFrameLater() : renderFrame(), 500);
 }
 
 async function startCamera() {
+  if (cameraStarting || state.counting) return;
   if (!navigator.mediaDevices?.getUserMedia) {
     showToast('Camera access is not supported here. Try uploading a photo.');
     return;
   }
   try {
+    cameraStarting = true;
     if (state.stream) state.stream.getTracks().forEach(track => track.stop());
+    state.stream = null;
+    video.srcObject = null;
     state.stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: state.facingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false
     });
     video.srcObject = state.stream;
     await video.play();
+    const actualFacing = state.stream.getVideoTracks()[0].getSettings().facingMode;
+    if (actualFacing) state.facingMode = actualFacing;
     state.sourceImage = null;
     state.running = true;
     cameraEmpty.classList.add('hidden');
@@ -178,10 +214,13 @@ async function startCamera() {
   } catch (error) {
     console.error(error);
     showToast('Camera permission was blocked. You can still upload a photo.');
+  } finally {
+    cameraStarting = false;
   }
 }
 
 async function flipCamera() {
+  if (cameraStarting || state.counting) return;
   state.facingMode = state.facingMode === 'user' ? 'environment' : 'user';
   await startCamera();
 }
@@ -192,11 +231,15 @@ function loadUpload(file) {
   reader.onload = () => {
     const image = new Image();
     image.onload = () => {
+      state.stream?.getTracks().forEach(track => track.stop());
+      state.stream = null;
+      video.srcObject = null;
       state.sourceImage = image;
       cameraEmpty.classList.add('hidden');
       statusText.textContent = 'UPLOADED PHOTO';
       showToast('Photo loaded. Pick a look and take your shot.');
     };
+    image.onerror = () => showToast('This photo could not be opened. Try a JPEG or PNG.');
     image.src = reader.result;
   };
   reader.readAsDataURL(file);
@@ -227,8 +270,9 @@ async function takePhoto() {
 
 function captureCurrentSource() {
   const capture = document.createElement('canvas');
-  capture.width = 900;
-  capture.height = 1125;
+  capture.width = templateConfig[state.template].width;
+  capture.height = templateConfig[state.template].height;
+  if (state.template === 'fourcut') { capture.width = 388; capture.height = 441; }
   const captureCtx = capture.getContext('2d');
   drawMedia(captureCtx, getLiveSource(), 0, 0, capture.width, capture.height);
   const shot = { url: capture.toDataURL('image/jpeg', .94), image: null };
@@ -240,6 +284,7 @@ function captureCurrentSource() {
   }
   updateShots();
   showToast(state.template === 'fourcut' && state.shots.length < 4 ? `Shot ${state.shots.length} captured — ${4 - state.shots.length} to go.` : 'Got it! Your photo is ready.');
+  if (state.template !== 'fourcut' || state.shots.length === 4) togglePanel(true);
 }
 
 function updateShots() {
@@ -252,12 +297,40 @@ function updateShots() {
   shotCount.textContent = `${Math.min(state.shots.length, required)} / ${required}`;
   frameCounter.textContent = state.template === 'fourcut' ? `FRAME ${String(Math.min(state.shots.length + 1, 4)).padStart(2, '0')} / 04` : 'SINGLE FRAME';
   downloadButton.disabled = state.shots.length === 0;
+  prepareExport();
+}
+
+async function prepareExport() {
+  const revision = ++exportRevision;
+  exportFile = null;
+  shareButton.disabled = true;
+  if (!state.shots.length) return;
+  await Promise.all(state.shots.map(async shot => {
+    if (!shot.image) { shot.image = new Image(); shot.image.src = shot.url; }
+    await shot.image.decode();
+  }));
+  if (revision !== exportRevision) return;
+  renderFrame(false);
+  canvas.toBlob(blob => {
+    if (!blob || revision !== exportRevision) return;
+    exportFile = new File([blob], `loop-booth-${state.template}.png`, { type: 'image/png' });
+    shareButton.hidden = !navigator.canShare?.({ files: [exportFile] });
+    shareButton.disabled = false;
+    if (!shareButton.hidden) document.querySelector('#saveNote').textContent = 'Tap Save to Photos / Share, then choose Save Image to keep it in Photos.';
+  }, 'image/png');
+}
+
+async function sharePhoto() {
+  if (!exportFile) return;
+  try { await navigator.share({ files: [exportFile], title: 'My Loop Booth photo' }); }
+  catch (error) { if (error.name !== 'AbortError') showToast('Sharing is unavailable here. Use Save your photo to download.'); }
 }
 
 function chooseFromGroup(containerSelector, button, stateKey, value) {
   document.querySelectorAll(`${containerSelector} button`).forEach(item => item.classList.remove('active'));
   button.classList.add('active');
   state[stateKey] = value;
+  prepareExport();
 }
 
 function selectTemplate(button) {
@@ -277,9 +350,10 @@ function downloadPhoto() {
   if (!state.shots.length) return;
   const link = document.createElement('a');
   link.download = `loop-booth-${state.template}-${Date.now()}.png`;
+  renderFrame(false);
   link.href = canvas.toDataURL('image/png');
   link.click();
-  showToast('Saved to your downloads.');
+  showToast('Download started. Check Files → Downloads.');
 }
 
 function resetAll() {
@@ -304,6 +378,21 @@ function showToast(message) {
 }
 
 document.querySelector('#startCamera').addEventListener('click', startCamera);
+function togglePanel(force) {
+  const panel = document.querySelector('.control-panel');
+  const expanded = typeof force === 'boolean' ? force : !panel.classList.contains('expanded');
+  panel.classList.toggle('expanded', expanded);
+  document.querySelector('#panelToggle').setAttribute('aria-expanded', String(expanded));
+  document.querySelector('#panelToggle').setAttribute('aria-label', expanded ? 'Collapse booth settings' : 'Expand booth settings');
+  document.querySelector('#panelToggle').textContent = expanded ? '−' : '＋';
+}
+document.querySelector('#panelToggle').addEventListener('click', () => togglePanel());
+document.querySelector('#settingsShortcut').addEventListener('click', () => {
+  togglePanel();
+  if (!matchMedia('(max-width:600px)').matches) document.querySelector('#templateGrid button').focus();
+});
+document.querySelectorAll('.upload-trigger').forEach(button => button.addEventListener('click', () => document.querySelector('#uploadPhoto').click()));
+shareButton.addEventListener('click', sharePhoto);
 document.querySelector('#flipCamera').addEventListener('click', flipCamera);
 document.querySelector('#shutter').addEventListener('click', takePhoto);
 document.querySelector('#uploadPhoto').addEventListener('change', event => loadUpload(event.target.files[0]));
