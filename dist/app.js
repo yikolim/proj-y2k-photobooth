@@ -16,6 +16,7 @@ let exportRevision = 0;
 let cameraStarting = false;
 
 const templateConfig = {
+  ...artworkTemplates,
   portrait: { width: 900, height: 1200, ratio: '3 / 4', label: 'PORTRAIT · 3:4' },
   story: { width: 720, height: 1280, ratio: '9 / 16', label: 'STORY · 9:16' },
   square: { width: 900, height: 900, ratio: '1 / 1', label: 'SQUARE · 1:1' },
@@ -31,7 +32,7 @@ const filterConfig = {
 };
 
 let state = {
-  template: 'portrait',
+  template: 'penguins',
   filter: 'clean',
   extra: 'none',
   stream: null,
@@ -41,6 +42,49 @@ let state = {
   running: false,
   counting: false
 };
+let selectedSlot = 0;
+const drafts = new Map();
+let liveFit = { zoom:1, x:0, y:0 };
+const slotSurface = document.createElement('canvas');
+const slotContext = slotSurface.getContext('2d', { willReadFrequently:true });
+const currentArt = () => artworkTemplates[state.template];
+const requiredShots = () => currentArt()?.slots.length || (state.template === 'fourcut' ? 4 : 1);
+const filledShots = () => state.shots.slice(0, requiredShots()).filter(Boolean).length;
+const complete = () => filledShots() === requiredShots();
+const selectedFit = () => state.shots[selectedSlot]?.fit || liveFit;
+
+function renderArtwork(guides) {
+  const art = currentArt();
+  if (!art.image.complete || !art.image.naturalWidth) return;
+  ctx.drawImage(art.image, 0, 0, canvas.width, canvas.height);
+  art.slots.forEach((slot, index) => {
+    const [x,y,w,h] = slot.box;
+    if (slotSurface.width !== w || slotSurface.height !== h) { slotSurface.width = w; slotSurface.height = h; }
+    const shot = state.shots[index];
+    const source = shot?.image || (index === selectedSlot ? getLiveSource() : null);
+    slotContext.clearRect(0,0,w,h);
+    if (source) {
+      const fit = shot?.fit || liveFit;
+      const sw = source.videoWidth || source.naturalWidth || source.width;
+      const sh = source.videoHeight || source.naturalHeight || source.height;
+      const scale = Math.max(w/sw,h/sh) * fit.zoom;
+      const dw = sw * scale, dh = sh * scale;
+      const dx = (w-dw)/2 + fit.x * (dw-w)/2;
+      const dy = (h-dh)/2 + fit.y * (dh-h)/2;
+      // Filter in a separate surface so Safari's pixel fallback respects the cutout.
+      drawMedia(slotContext, source, dx,dy,dw,dh);
+    } else { slotContext.fillStyle='#eaeaea'; slotContext.fillRect(0,0,w,h); }
+    ctx.save();
+    ctx.clip(slot.clip);
+    ctx.drawImage(slotSurface,x,y,w,h);
+    if (!source && guides) {
+      ctx.fillStyle='#555'; ctx.font=`600 ${Math.round(w*.1)}px Manrope, sans-serif`;
+      ctx.textAlign='center'; ctx.fillText(`PHOTO ${index+1}`,x+w/2,y+h/2); ctx.textAlign='left';
+    }
+    ctx.restore();
+    if (guides && index === selectedSlot) { ctx.save(); ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=3; ctx.setLineDash([9,9]); ctx.stroke(slot.clip); ctx.restore(); }
+  });
+}
 
 function resizeCanvas() {
   const config = templateConfig[state.template];
@@ -87,7 +131,10 @@ function drawMedia(target, source, x, y, width, height, filter = filterConfig[st
   target.restore();
   // Older Safari versions lack CanvasRenderingContext2D.filter.
   if (!('filter' in CanvasRenderingContext2D.prototype) && filter !== 'none') {
-    const pixels = target.getImageData(x, y, width, height);
+    const px = Math.max(0, Math.floor(x)), py = Math.max(0, Math.floor(y));
+    const pw = Math.min(target.canvas.width-px, Math.ceil(width)), ph = Math.min(target.canvas.height-py, Math.ceil(height));
+    if (pw <= 0 || ph <= 0) return;
+    const pixels = target.getImageData(px, py, pw, ph);
     const data = pixels.data;
     const settings = {
       clean: [1, 1, 1, 0, 0], glow: [1.08, .94, 1.08, 5, -3],
@@ -101,7 +148,7 @@ function drawMedia(target, source, x, y, width, height, filter = filterConfig[st
         data[i + channel] = ((gray + (data[i + channel] - gray) * saturation) * brightness - 128) * contrast + 128 + (channel === 0 ? red : channel === 2 ? blue : 0);
       }
     }
-    target.putImageData(pixels, x, y);
+    target.putImageData(pixels, px, py);
   }
 }
 
@@ -114,7 +161,7 @@ function drawShot(target, imageData, x, y, width, height) {
     imageData.image = new Image();
     imageData.image.src = imageData.url;
   }
-  if (imageData.image.complete) drawMedia(target, imageData.image, x, y, width, height, 'none');
+  if (imageData.image.complete || imageData.image instanceof HTMLCanvasElement) drawMedia(target, imageData.image, x, y, width, height);
 }
 
 function drawDecoration(target, width, height) {
@@ -149,14 +196,16 @@ function drawDecoration(target, width, height) {
   target.restore();
 }
 
-function renderFrame(loop = true) {
+function renderFrame(loop = true, guides = true) {
   resizeCanvas();
   const { width, height } = canvas;
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = '#f7f2e8';
   ctx.fillRect(0, 0, width, height);
 
-  if (state.template === 'portrait' || state.template === 'story' || state.template === 'square') {
+  if (currentArt()) {
+    renderArtwork(guides);
+  } else if (state.template === 'portrait' || state.template === 'story' || state.template === 'square') {
     drawShot(ctx, state.shots[0], 0, 0, width, height);
   } else {
     const gap = Math.round(width * .018);
@@ -171,7 +220,7 @@ function renderFrame(loop = true) {
     }
     ctx.fillStyle = '#171714';
     ctx.font = `800 ${Math.round(width * .034)}px Manrope, sans-serif`;
-    ctx.fillText('LOOP BOOTH', margin, height - margin * .72);
+    ctx.fillText('Y2K PHOTOBOOTH', margin, height - margin * .72);
     ctx.textAlign = 'right';
     ctx.font = `500 ${Math.round(width * .018)}px monospace`;
     ctx.fillText('MAKE A MOMENT · KEEP THE FEELING', width - margin, height - margin * .75);
@@ -237,7 +286,8 @@ function loadUpload(file) {
       state.sourceImage = image;
       cameraEmpty.classList.add('hidden');
       statusText.textContent = 'UPLOADED PHOTO';
-      showToast('Photo loaded. Pick a look and take your shot.');
+      if (currentArt()) captureCurrentSource();
+      else showToast('Photo loaded. Pick a look and take your shot.');
     };
     image.onerror = () => showToast('This photo could not be opened. Try a JPEG or PNG.');
     image.src = reader.result;
@@ -250,7 +300,7 @@ function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 async function takePhoto() {
   if (state.counting) return;
   if (!getLiveSource()) {
-    showToast('Start your camera or upload a photo first.');
+    await startCamera();
     return;
   }
   state.counting = true;
@@ -269,34 +319,54 @@ async function takePhoto() {
 }
 
 function captureCurrentSource() {
+  const source = getLiveSource();
+  if (!source) return;
   const capture = document.createElement('canvas');
-  capture.width = templateConfig[state.template].width;
-  capture.height = templateConfig[state.template].height;
-  if (state.template === 'fourcut') { capture.width = 388; capture.height = 441; }
+  const sw = source.videoWidth || source.naturalWidth;
+  const sh = source.videoHeight || source.naturalHeight;
+  const scale = Math.min(1, 1800/Math.max(sw,sh));
+  capture.width = Math.round(sw*scale);
+  capture.height = Math.round(sh*scale);
   const captureCtx = capture.getContext('2d');
-  drawMedia(captureCtx, getLiveSource(), 0, 0, capture.width, capture.height);
-  const shot = { url: capture.toDataURL('image/jpeg', .94), image: null };
-  if (state.template === 'fourcut') {
+  drawMedia(captureCtx, source, 0, 0, capture.width, capture.height, 'none');
+  const shot = { url: capture.toDataURL('image/jpeg', .94), image: capture, fit:{...liveFit} };
+  if (currentArt()) {
+    state.shots[selectedSlot] = shot;
+    const next = currentArt().slots.findIndex((_,i) => !state.shots[i]);
+    if (next >= 0) selectedSlot = next;
+    liveFit = { zoom:1,x:0,y:0 };
+  } else if (state.template === 'fourcut') {
     if (state.shots.length >= 4) state.shots.shift();
     state.shots.push(shot);
   } else {
     state.shots = [shot];
   }
   updateShots();
-  showToast(state.template === 'fourcut' && state.shots.length < 4 ? `Shot ${state.shots.length} captured — ${4 - state.shots.length} to go.` : 'Got it! Your photo is ready.');
-  if (state.template !== 'fourcut' || state.shots.length === 4) togglePanel(true);
+  showToast(complete() ? 'Your template is ready to save.' : `Photo saved. Fill photo ${selectedSlot+1} next.`);
+  if (complete()) togglePanel(true);
 }
 
 function updateShots() {
   document.querySelectorAll('.shot').forEach((button, index) => {
     const shot = state.shots[index];
+    button.hidden = index >= requiredShots();
+    button.setAttribute('aria-label', shot ? `Select photo ${index+1}` : `Empty photo ${index+1}`);
     button.innerHTML = shot ? `<img src="${shot.url}" alt="Captured shot ${index + 1}">` : `<span>${index + 1}</span>`;
     button.classList.toggle('empty', !shot);
   });
-  const required = state.template === 'fourcut' ? 4 : 1;
-  shotCount.textContent = `${Math.min(state.shots.length, required)} / ${required}`;
-  frameCounter.textContent = state.template === 'fourcut' ? `FRAME ${String(Math.min(state.shots.length + 1, 4)).padStart(2, '0')} / 04` : 'SINGLE FRAME';
-  downloadButton.disabled = state.shots.length === 0;
+  const required = requiredShots();
+  shotCount.textContent = `${filledShots()} / ${required}`;
+  frameCounter.textContent = currentArt() ? `PHOTO ${selectedSlot+1} / ${required}` : `${filledShots()} / ${required} CAPTURED`;
+  downloadButton.disabled = true;
+  document.querySelector('#artworkTools').hidden = !currentArt();
+  document.querySelector('#photoAdjustment').hidden = !currentArt();
+  canvasWrap.classList.toggle('artwork-preview', !!currentArt());
+  cameraEmpty.classList.toggle('hidden', !!currentArt() || !!getLiveSource());
+  document.querySelector('#slotButtons').innerHTML = currentArt() ? currentArt().slots.map((_,i)=>`<button data-slot="${i}" aria-pressed="${i===selectedSlot}">Photo ${i+1}${state.shots[i]?' ✓':''}</button>`).join('') : '';
+  const fit = selectedFit();
+  document.querySelector('#photoZoom').value=fit.zoom;
+  document.querySelector('#photoX').value=fit.x;
+  document.querySelector('#photoY').value=fit.y;
   prepareExport();
 }
 
@@ -304,16 +374,19 @@ async function prepareExport() {
   const revision = ++exportRevision;
   exportFile = null;
   shareButton.disabled = true;
-  if (!state.shots.length) return;
-  await Promise.all(state.shots.map(async shot => {
+  downloadButton.disabled = true;
+  if (!complete()) return;
+  await currentArt()?.ready;
+  await Promise.all(state.shots.filter(Boolean).map(async shot => {
     if (!shot.image) { shot.image = new Image(); shot.image.src = shot.url; }
-    await shot.image.decode();
+    if (shot.image.decode) await shot.image.decode();
   }));
   if (revision !== exportRevision) return;
-  renderFrame(false);
+  renderFrame(false, false);
   canvas.toBlob(blob => {
     if (!blob || revision !== exportRevision) return;
-    exportFile = new File([blob], `loop-booth-${state.template}.png`, { type: 'image/png' });
+    exportFile = new File([blob], `y2k-photobooth-${state.template}.png`, { type: 'image/png' });
+    downloadButton.disabled = false;
     shareButton.hidden = !navigator.canShare?.({ files: [exportFile] });
     shareButton.disabled = false;
     if (!shareButton.hidden) document.querySelector('#saveNote').textContent = 'Tap Save to Photos / Share, then choose Save Image to keep it in Photos.';
@@ -322,7 +395,7 @@ async function prepareExport() {
 
 async function sharePhoto() {
   if (!exportFile) return;
-  try { await navigator.share({ files: [exportFile], title: 'My Loop Booth photo' }); }
+  try { await navigator.share({ files: [exportFile], title: 'My Y2K Photobooth photo' }); }
   catch (error) { if (error.name !== 'AbortError') showToast('Sharing is unavailable here. Use Save your photo to download.'); }
 }
 
@@ -334,9 +407,16 @@ function chooseFromGroup(containerSelector, button, stateKey, value) {
 }
 
 function selectTemplate(button) {
-  chooseFromGroup('#templateGrid', button, 'template', button.dataset.template);
+  if (state.counting) return;
+  drafts.set(state.template, state.shots);
+  state.template = button.dataset.template;
+  state.shots = drafts.get(state.template) || [];
+  selectedSlot = 0;
+  liveFit = {zoom:1,x:0,y:0};
+  document.querySelectorAll('[data-template]').forEach(item => { item.classList.toggle('active',item.dataset.template===state.template); item.setAttribute('aria-pressed',String(item.dataset.template===state.template)); });
   resizeCanvas();
   updateShots();
+  togglePanel(false);
 }
 
 function removeShot(index) {
@@ -347,21 +427,23 @@ function removeShot(index) {
 }
 
 function downloadPhoto() {
-  if (!state.shots.length) return;
+  if (!exportFile) return;
   const link = document.createElement('a');
-  link.download = `loop-booth-${state.template}-${Date.now()}.png`;
-  renderFrame(false);
-  link.href = canvas.toDataURL('image/png');
+  link.download = `y2k-photobooth-${state.template}-${Date.now()}.png`;
+  link.href = URL.createObjectURL(exportFile);
   link.click();
+  setTimeout(() => URL.revokeObjectURL(link.href), 10000);
   showToast('Download started. Check Files → Downloads.');
 }
 
 function resetAll() {
-  state.template = 'portrait';
+  if (state.counting) return;
   state.filter = 'clean';
   state.extra = 'none';
   state.shots = [];
-  document.querySelectorAll('#templateGrid button').forEach(button => button.classList.toggle('active', button.dataset.template === 'portrait'));
+  drafts.set(state.template, []);
+  selectedSlot=0;
+  liveFit={zoom:1,x:0,y:0};
   document.querySelectorAll('#filterList button').forEach(button => button.classList.toggle('active', button.dataset.filter === 'clean'));
   document.querySelectorAll('#extraList button').forEach(button => button.classList.toggle('active', button.dataset.extra === 'none'));
   resizeCanvas();
@@ -378,6 +460,19 @@ function showToast(message) {
 }
 
 document.querySelector('#startCamera').addEventListener('click', startCamera);
+document.querySelector('#enableCamera').addEventListener('click', startCamera);
+document.querySelector('#artworkGallery').innerHTML = Object.entries(artworkTemplates).map(([key,art]) => `<button class="artwork-card" data-template="${key}"><img src="./templates/${art.file}.png" alt="${art.name} photo template"><span>${art.name}</span><small>${art.slots.length} photo${art.slots.length>1?'s':''}</small></button>`).join('');
+document.querySelector('#artworkGallery').addEventListener('click', event => {
+  const button=event.target.closest('[data-template]'); if(button) selectTemplate(button);
+});
+document.querySelector('#slotButtons').addEventListener('click', event => {
+  const button=event.target.closest('[data-slot]'); if(button && !state.counting) { selectedSlot=Number(button.dataset.slot); updateShots(); }
+});
+for (const [id,key] of [['photoZoom','zoom'],['photoX','x'],['photoY','y']]) {
+  document.getElementById(id).addEventListener('input',event => { selectedFit()[key]=Number(event.target.value); prepareExport(); });
+}
+document.querySelector('#clearSlot').addEventListener('click', () => { if(state.counting)return; state.shots[selectedSlot]=null; updateShots(); });
+document.querySelector('#resetFit').addEventListener('click', () => { Object.assign(selectedFit(),{zoom:1,x:0,y:0}); updateShots(); });
 function togglePanel(force) {
   const panel = document.querySelector('.control-panel');
   const expanded = typeof force === 'boolean' ? force : !panel.classList.contains('expanded');
@@ -395,7 +490,7 @@ document.querySelectorAll('.upload-trigger').forEach(button => button.addEventLi
 shareButton.addEventListener('click', sharePhoto);
 document.querySelector('#flipCamera').addEventListener('click', flipCamera);
 document.querySelector('#shutter').addEventListener('click', takePhoto);
-document.querySelector('#uploadPhoto').addEventListener('change', event => loadUpload(event.target.files[0]));
+document.querySelector('#uploadPhoto').addEventListener('change', event => { if(!state.counting)loadUpload(event.target.files[0]); event.target.value=''; });
 document.querySelector('#templateGrid').addEventListener('click', event => {
   const button = event.target.closest('button[data-template]');
   if (button) selectTemplate(button);
@@ -410,12 +505,11 @@ document.querySelector('#extraList').addEventListener('click', event => {
 });
 document.querySelector('#shots').addEventListener('click', event => {
   const button = event.target.closest('.shot');
-  if (button) removeShot(Number(button.dataset.index));
+  if (button && !state.counting) { if(currentArt()){selectedSlot=Number(button.dataset.index);updateShots();}else removeShot(Number(button.dataset.index)); }
 });
 document.querySelector('#resetAll').addEventListener('click', resetAll);
 document.querySelector('#downloadButton').addEventListener('click', downloadPhoto);
 window.addEventListener('beforeunload', () => state.stream?.getTracks().forEach(track => track.stop()));
 
-resizeCanvas();
-updateShots();
+selectTemplate(document.querySelector('[data-template="penguins"]'));
 renderFrame();
