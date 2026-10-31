@@ -8,7 +8,7 @@
     <title>Y2K Photobooth</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Open+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../shared/styles.css" />
     <link rel="stylesheet" href="../shared/icy.css" />
     <link rel="stylesheet" href="../shared/layout.css" />
@@ -35,6 +35,10 @@
       </section>
 
       <section class="booth" aria-label="Photo booth studio">
+        <nav class="top-nav" aria-label="Sections">
+          <button class="nav-tab" id="navTemplates" aria-pressed="true"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="9.5" r="1.8" fill="currentColor"/><path d="M4 18l5-5 3.5 3.5L15 14l5 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Templates</span></button>
+          <button class="nav-tab" id="navCamera" aria-pressed="false"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3.5l1.5-2.5h6L16.5 8H20a1.5 1.5 0 0 1 1.5 1.5V18A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9.5A1.5 1.5 0 0 1 4 8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span>Camera</span></button>
+        </nav>
         <div class="stage-shell">
           <div class="stage-topline">
             <span>LIVE PREVIEW</span>
@@ -57,15 +61,13 @@
             </div>
             <div class="countdown" id="countdown" aria-live="assertive"></div>
           </div>
+          <div class="stage-status"><span class="status-dot" aria-hidden="true"></span><span id="statusText">CAMERA OFF</span></div>
           <div class="capture-row">
-            <button class="icon-button" id="flipCamera" aria-label="Flip camera" title="Flip camera">↻</button>
-            <button class="shutter" id="shutter" aria-label="Take photo">
-              <span></span>
-            </button>
-            <button class="icon-button upload-trigger" aria-label="Upload photo" title="Upload photo">↥</button>
+            <button class="action-button" id="retakeButton"><span class="action-icon" aria-hidden="true">↻</span><span>Retake</span></button>
+            <button class="shutter" id="shutter" aria-label="Take photo"><span>Take Photo</span></button>
+            <button class="action-button" id="exportButton"><span class="action-icon" aria-hidden="true">↥</span><span>Export</span></button>
           </div>
           <div class="stage-caption">
-            <span id="statusText">CAMERA OFF</span>
             <span id="templateLabel">PORTRAIT · 3:4</span>
           </div>
           <div class="save-row" id="saveRow">
@@ -110,8 +112,12 @@
             </div>
           </div>
 
-          <div class="control-group">
-            <div class="control-title"><span>02</span><h3>Find your filter</h3></div>
+          <div class="control-group" id="cameraGroup">
+            <div class="control-title"><span>02</span><h3>Camera</h3></div>
+            <div class="camera-tools">
+              <button class="tool-chip" id="flipCamera"><span aria-hidden="true">↻</span>Flip camera</button>
+              <button class="tool-chip upload-trigger"><span aria-hidden="true">↥</span>Upload photo</button>
+            </div>
             <div class="filter-list" id="filterList">
               <button class="filter-chip active" data-filter="clean"><span class="swatch swatch-clean"></span>Clean</button>
               <button class="filter-chip" data-filter="glow"><span class="swatch swatch-glow"></span>Glow</button>
@@ -149,11 +155,9 @@
             </div>
           </div>
 
+          <button class="strip-arrow" id="stripPrev" data-dir="-1" aria-label="Scroll left">‹</button>
+          <button class="strip-arrow" id="stripNext" data-dir="1" aria-label="Scroll right">›</button>
         </aside>
-        <div class="bottom-tabs">
-          <button id="filterTab" aria-pressed="false">Filter</button>
-          <button id="saveTab">Save</button>
-        </div>
       </section>
 
       <section class="how" id="how-it-works">
