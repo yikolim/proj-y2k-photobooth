@@ -1,0 +1,106 @@
+/* Y2K Photobooth — Frutiger Aero skin: glossy glass over a sky-and-grass
+   gradient, Vista-style title bar, bubble buttons. Loaded after shared/layout.css,
+   so it only supplies colors, borders, fonts and effects. */
+:root {
+  --sky-a: #0b6fd8; --sky-b: #5cc5ff; --sky-c: #c9f3ff; --grass: #7ed321; --grass-b: #3ea80f;
+  --glass: rgba(255,255,255,.42); --glass-strong: rgba(255,255,255,.72); --edge: rgba(255,255,255,.95);
+  --ink: #0b3a66; --muted: #3a6b96; --aqua: #19b9f3; --orange: #ff9b1a;
+  --gloss: linear-gradient(180deg, rgba(255,255,255,.95) 0%, rgba(255,255,255,.55) 48%, rgba(255,255,255,.18) 52%, rgba(255,255,255,.35) 100%);
+  --bubble: 0 1px 0 rgba(255,255,255,.9) inset, 0 -1px 0 rgba(0,70,140,.18) inset, 0 6px 14px rgba(5,60,120,.25);
+}
+
+html { background: var(--sky-a); }
+body {
+  color: var(--ink); font-family: "Nunito", "Segoe UI", "Frutiger", "Trebuchet MS", sans-serif;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% 118%, var(--grass) 0%, var(--grass-b) 38%, transparent 62%),
+    radial-gradient(circle at 82% 8%, rgba(255,255,255,.75), transparent 28%),
+    radial-gradient(circle at 15% 30%, rgba(255,255,255,.45), transparent 32%),
+    linear-gradient(180deg, var(--sky-a) 0%, var(--sky-b) 48%, var(--sky-c) 100%);
+  background-attachment: fixed;
+}
+/* Floating bubbles */
+body::before { content: ""; display: block; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.25) 40%, rgba(255,255,255,.05) 60%, transparent 62%) 8% 72% / 120px 120px no-repeat,
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.25) 40%, rgba(255,255,255,.05) 60%, transparent 62%) 88% 18% / 70px 70px no-repeat,
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.25) 40%, rgba(255,255,255,.05) 60%, transparent 62%) 78% 86% / 160px 160px no-repeat,
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.25) 40%, rgba(255,255,255,.05) 60%, transparent 62%) 20% 10% / 44px 44px no-repeat; }
+body::after { display: none; }
+button, input, .text-button { font-family: inherit; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+
+/* ---- Glass window ---- */
+@media (min-width: 601px) {
+  body { margin: 22px auto; border-radius: 14px; border: 1px solid var(--edge); min-height: 0;
+    background-attachment: scroll; box-shadow: 0 24px 60px rgba(0,40,90,.35), 0 0 0 1px rgba(0,60,120,.25); overflow: hidden; }
+  html { background: linear-gradient(180deg, var(--sky-a), var(--sky-b) 60%, var(--grass-b)); min-height: 100%; }
+}
+.site-header { height: auto; min-height: 0; padding: 6px 8px 0; display: block; border: 0; background: transparent; }
+.site-header .brand { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 10px; width: auto; margin: 0;
+  padding: 7px 12px; border-radius: 10px 10px 0 0; border: 1px solid var(--edge); border-bottom: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.35) 50%, rgba(170,220,255,.35) 52%, rgba(255,255,255,.3));
+  backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  color: var(--ink); font-size: 16px; font-weight: 800; letter-spacing: .02em; line-height: 1; text-shadow: 0 1px 0 #fff; box-shadow: none; }
+.brand-mark { display: grid !important; width: 20px; height: 20px; gap: 2px; transform: none; padding: 0; }
+.brand-mark span { border-radius: 50%; box-shadow: inset 0 2px 3px rgba(255,255,255,.9), 0 1px 2px rgba(0,40,80,.35); }
+.brand-mark span:nth-child(1) { background: var(--aqua); } .brand-mark span:nth-child(2) { background: var(--grass); }
+.brand-mark span:nth-child(3) { background: var(--orange); } .brand-mark span:nth-child(4) { background: #3b7cff; }
+.brand > span:not(.brand-mark) { display: inline; }
+.brand small { display: inline; font: inherit; font-weight: 600; letter-spacing: 0; margin: 0; color: var(--muted); }
+.brand small::before { content: " "; }
+.win-controls { display: flex; gap: 6px; margin-left: auto; }
+.win-controls i { display: grid; place-items: center; width: 26px; height: 18px; font: 700 11px/1 "Nunito", sans-serif; font-style: normal; color: #fff;
+  border-radius: 5px; border: 1px solid rgba(0,50,110,.5); background: linear-gradient(180deg, #8fd0ff, #2a86df 50%, #1766c0 52%, #4ea8ff); box-shadow: var(--bubble); text-shadow: 0 1px 1px rgba(0,0,0,.4); }
+.win-controls i:last-child { width: 36px; background: linear-gradient(180deg, #ffb4a8, #e24e3a 50%, #c22e1c 52%, #f0705c); }
+
+/* ---- Booth body ---- */
+.booth { margin: 0 8px 8px; border-radius: 0 0 12px 12px; border: 1px solid var(--edge); border-top: 0;
+  background: var(--glass); backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 10px 30px rgba(5,60,120,.25); padding-bottom: 4px; }
+.canvas-wrap, .canvas-wrap:has(.camera-empty:not(.hidden)), .artwork-preview { border-radius: 12px; border: 1px solid var(--edge); overflow: hidden;
+  background: linear-gradient(180deg, #e8f7ff, #ffffff); box-shadow: inset 0 0 0 1px rgba(0,80,160,.12), 0 6px 18px rgba(5,60,120,.2); }
+.canvas-wrap::after { content: ""; position: absolute; inset: 0 0 55% 0; z-index: 3; pointer-events: none; border-radius: 12px 12px 50% 50% / 12px 12px 30% 30%;
+  background: linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,0)); }
+.camera-empty { color: var(--ink); } .camera-empty p { color: var(--muted); }
+.camera-empty h2 { font-weight: 800; letter-spacing: -.02em; }
+.empty-icon { background: var(--gloss); border: 1px solid var(--edge); box-shadow: var(--bubble); }
+.lens { background: radial-gradient(circle at 35% 35%, #fff, var(--aqua) 45%, #0a5fb8); }
+.countdown { color: #fff; text-shadow: 0 2px 12px rgba(0,60,140,.6); }
+
+/* Toolbar */
+.icon-button, .button, .text-button { color: var(--ink); border: 1px solid rgba(0,60,130,.45); border-radius: 999px; background: var(--gloss), linear-gradient(180deg, #d9f1ff, #8ccdf7); box-shadow: var(--bubble); font-weight: 800; text-shadow: 0 1px 0 #fff; }
+.icon-button { border-radius: 999px; }
+.icon-button:hover, .button:hover { filter: brightness(1.06); transform: none; }
+.icon-button:active, .button:active, .shutter:active { transform: translateY(1px); box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 2px 6px rgba(5,60,120,.25); }
+.button-dark { color: #fff; background: var(--gloss), linear-gradient(180deg, #a6e86a, var(--grass-b)); text-shadow: 0 1px 1px rgba(0,60,0,.5); border-color: #2f7f12; }
+.shutter { border: 1px solid rgba(0,60,130,.45); padding: 3px; background: linear-gradient(180deg, #fff, #cfe9fb); box-shadow: var(--bubble); }
+.shutter span { background: radial-gradient(circle at 35% 30%, #fff 0, #ffd089 18%, var(--orange) 50%, #e67700); box-shadow: inset 0 -2px 4px rgba(150,70,0,.45), inset 0 2px 3px rgba(255,255,255,.9); }
+
+/* Template strip */
+.control-panel, .control-panel.expanded { border: 1px solid var(--edge); border-radius: 12px; background: var(--glass-strong); box-shadow: inset 0 1px 0 #fff, 0 4px 14px rgba(5,60,120,.15); }
+.control-panel > .control-group { scrollbar-width: thin; scrollbar-color: rgba(0,90,170,.45) transparent; }
+.control-panel > .control-group::-webkit-scrollbar { height: 8px; }
+.control-panel > .control-group::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #9ad8ff, #2b8ae0); border-radius: 999px; border: 1px solid rgba(255,255,255,.8); }
+.artwork-card img, .template-card .template-icon { border-radius: 10px; border: 1px solid var(--edge); background: linear-gradient(180deg, #fff, #e6f5ff); box-shadow: 0 3px 10px rgba(5,60,120,.18), inset 0 1px 0 #fff; transition: transform .15s; }
+.artwork-card:hover img, .template-card:hover .template-icon { transform: translateY(-2px); }
+.template-icon { border-color: var(--edge); }
+.artwork-card span, .template-card strong { font: 700 13px/1 "Nunito", sans-serif; color: var(--ink); text-shadow: 0 1px 0 rgba(255,255,255,.8); }
+.artwork-card.active span, .template-card.active strong { font-weight: 800; color: #0a5fb8; }
+.artwork-card.active img, .template-card.active .template-icon { outline: 3px solid var(--aqua); outline-offset: -1px; box-shadow: 0 0 0 1px #fff, 0 0 18px rgba(25,185,243,.8), 0 3px 10px rgba(5,60,120,.18); }
+.filter-chip { color: var(--ink); border: 1px solid rgba(0,60,130,.35); border-radius: 999px; background: var(--gloss), linear-gradient(180deg, #eef9ff, #bfe3fa); box-shadow: var(--bubble); font-weight: 700; font-size: 14px; }
+.filter-chip:hover { border-color: rgba(0,60,130,.35); }
+.filter-chip.active { color: #fff; background: var(--gloss), linear-gradient(180deg, #5ec8ff, #0a6fd0); text-shadow: 0 1px 1px rgba(0,30,80,.5); border-color: #0a5fb8; }
+.swatch { border: 1px solid rgba(255,255,255,.9); filter: none; box-shadow: inset 0 2px 3px rgba(255,255,255,.7), 0 1px 2px rgba(0,40,80,.3); }
+.fit-control input { accent-color: var(--aqua); }
+
+/* Bottom tabs */
+.bottom-tabs { padding: 6px 6px 8px; gap: 8px; }
+.bottom-tabs button { color: var(--ink); font: 800 16px "Nunito", sans-serif; letter-spacing: .02em; text-shadow: 0 1px 0 #fff; border-radius: 999px;
+  border: 1px solid rgba(0,60,130,.45); background: var(--gloss), linear-gradient(180deg, #d9f1ff, #8ccdf7); box-shadow: var(--bubble); }
+.bottom-tabs button:hover { filter: brightness(1.05); }
+.bottom-tabs button[aria-pressed="true"], .bottom-tabs button:active { color: #fff; background: var(--gloss), linear-gradient(180deg, #5ec8ff, #0a6fd0); text-shadow: 0 1px 1px rgba(0,30,80,.5); border-color: #0a5fb8; }
+.bottom-tabs #saveTab { color: #fff; background: var(--gloss), linear-gradient(180deg, #a6e86a, var(--grass-b)); text-shadow: 0 1px 1px rgba(0,60,0,.5); border-color: #2f7f12; }
+
+.toast { color: var(--ink); background: var(--glass-strong); border: 1px solid var(--edge); border-radius: 999px; backdrop-filter: blur(14px); box-shadow: 0 8px 24px rgba(5,60,120,.3); font-weight: 700; }
+@media (max-width: 600px) { .site-header .brand { font-size: 15px; } .booth { margin: 0 6px 6px; } }

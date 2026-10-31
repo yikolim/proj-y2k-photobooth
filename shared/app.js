@@ -458,7 +458,7 @@ function showToast(message) {
 }
 
 document.querySelector('#startCamera').addEventListener('click', startCamera);
-document.querySelector('#artworkGallery').innerHTML = Object.entries(artworkTemplates).map(([key,art]) => `<button class="artwork-card" data-template="${key}"><img src="./templates/${art.file}.png" alt="${art.name} photo template"><span>${art.name}</span><small>${art.slots.length} photo${art.slots.length>1?'s':''}</small></button>`).join('');
+document.querySelector('#artworkGallery').innerHTML = Object.entries(artworkTemplates).map(([key,art]) => `<button class="artwork-card" data-template="${key}"><img src="${templateBase}${art.file}.png" alt="${art.name} photo template"><span>${art.name}</span><small>${art.slots.length} photo${art.slots.length>1?'s':''}</small></button>`).join('');
 document.querySelector('#artworkGallery').addEventListener('click', event => {
   const button=event.target.closest('[data-template]'); if(button) selectTemplate(button);
 });
