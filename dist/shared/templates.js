@@ -1,3 +1,4 @@
+const templateBase = new URL('./templates/', document.currentScript.src).href;
 // Paths are expressed in the original artwork coordinates. They replace the
 // baked-in checkerboards at render time, leaving the supplied PNGs untouched.
 const artworkTemplates = {
@@ -32,7 +33,7 @@ for (const [key, template] of Object.entries(artworkTemplates)) {
   template.ratio = `${template.width} / ${template.height}`;
   template.label = `${template.name.toUpperCase()} · ${template.slots.length} PHOTO${template.slots.length > 1 ? 'S' : ''}`;
   template.image = new Image();
-  template.image.src = `./templates/${template.file}.png`;
+  template.image.src = `${templateBase}${template.file}.png`;
   template.ready = template.image.decode();
   template.ready.catch(() => {});
   template.slots.forEach(slot => { slot.clip = new Path2D(slot.path); });
