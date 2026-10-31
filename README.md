@@ -13,7 +13,7 @@ Each visual version lives in its own folder under `dist/` and gets its own URL:
 | Windows 98 | `dist/windows/` | https://yikolim.github.io/proj-y2k-photobooth/windows/ |
 | Frutiger Aero | `dist/aero/` | https://yikolim.github.io/proj-y2k-photobooth/aero/ |
 
-`dist/index.html` is a tiny redirect to whichever version is the default.
+`dist/index.html` is a tiny redirect to the default version (currently Aero).
 
 Everything that isn't a skin is shared, so UX changes land once and apply to every version:
 
