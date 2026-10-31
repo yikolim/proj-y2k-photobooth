@@ -55,8 +55,6 @@ button:focus-visible, label:focus-visible, a:focus-visible { outline: 1px dotted
 }
 .button { min-height: 32px; padding: 6px 16px; font-size: 16px; }
 .button-dark, .button-light { background: var(--face); color: #000; }
-.shutter { border-radius: 50%; border: 2px solid #000; background: var(--face); box-shadow: inset 2px 2px var(--hi), inset -2px -2px var(--shade); }
-.shutter span { background: #e0004d; border: 2px solid #000; box-shadow: inset 2px 2px #ff6b9a; }
 .text-button { min-height: 28px; padding: 2px 10px; font: 400 15px "Pixelify Sans", sans-serif; text-decoration: none; }
 #slotHint { color: #000; font: 400 15px/1.25 "VT323", monospace; }
 .save-row { margin-top: 10px; }
@@ -125,6 +123,14 @@ button:focus-visible, label:focus-visible, a:focus-visible { outline: 1px dotted
 /* ---- Win98 skin for the shared phone layout (shared/layout.css) ---- */
 .menubar { display: flex; }
 .icon-button { border-radius: 0; }
+.nav-tab, .action-button, .shutter, .tool-chip, .control-panel > .strip-arrow { border: var(--raised-border); border-color: var(--raised-colors); box-shadow: var(--raised-shadow); background: var(--face); color: #000; border-radius: 0; font-family: "Pixelify Sans", sans-serif; font-weight: 400; }
+.nav-tab:active, .nav-tab[aria-pressed="true"], .action-button:active, .shutter:active, .tool-chip:active, .control-panel > .strip-arrow:active { border-color: var(--sunken-colors); box-shadow: var(--sunken-shadow); }
+.nav-tab[aria-pressed="true"] { background: var(--face) repeating-conic-gradient(var(--hi) 0 25%, transparent 0 50%) 0 0 / 4px 4px; font-weight: 700; }
+.shutter { padding: 6px 10px; font-weight: 700; }
+.shutter span { border: 0; background: none; box-shadow: none; }
+.stage-status { font: 400 15px/1 "VT323", monospace; text-transform: none; letter-spacing: 0; border: var(--raised-border); border-color: var(--sunken-colors); box-shadow: var(--sunken-shadow); background: #fff; }
+.status-dot { border: 1px solid #000; }
+.control-panel > .strip-arrow { font-family: "VT323", monospace; }
 .canvas-wrap, .canvas-wrap:has(.camera-empty:not(.hidden)), .artwork-preview { background: #fff; }
 .control-panel, .control-panel.expanded { border-color: var(--sunken-colors); box-shadow: var(--sunken-shadow); background: var(--face); }
 .control-panel > .control-group { scrollbar-width: auto; }
@@ -135,6 +141,4 @@ button:focus-visible, label:focus-visible, a:focus-visible { outline: 1px dotted
 .artwork-card span, .template-card strong { font: 400 14px/1 "Pixelify Sans", sans-serif; }
 .artwork-card.active span, .template-card.active strong { font-weight: 700; }
 .artwork-card.active img, .template-card.active .template-icon { outline: 2px solid var(--title-a); outline-offset: -2px; }
-.bottom-tabs button { font: 700 16px "Pixelify Sans", sans-serif; color: #000; border: var(--raised-border); border-color: var(--raised-colors); box-shadow: var(--raised-shadow); background: var(--face); }
-.bottom-tabs button:active, .bottom-tabs button[aria-pressed="true"] { border-color: var(--sunken-colors); box-shadow: var(--sunken-shadow); background: var(--face) repeating-conic-gradient(var(--hi) 0 25%, transparent 0 50%) 0 0 / 4px 4px; }
 @media (max-width: 600px) { .control-panel { border-bottom: var(--raised-border); border-bottom-color: var(--hi); } }

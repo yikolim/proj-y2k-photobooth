@@ -475,15 +475,25 @@ function togglePanel(force) {
 }
 // The whole "Select templates" bar is the tap target on phones.
 document.querySelector('#panelOpen').addEventListener('click', () => togglePanel());
-// Bottom tabs: Filter swaps the template strip for the filter strip; Save shares or downloads.
-document.querySelector('#filterTab').addEventListener('click', event => {
-  const open = document.body.classList.toggle('filters-open');
-  event.currentTarget.setAttribute('aria-pressed', String(open));
-});
-document.querySelector('#saveTab').addEventListener('click', () => {
+// Top nav: Templates shows the template strip, Camera shows flip/upload + filters.
+const navTabs = { templates: document.querySelector('#navTemplates'), camera: document.querySelector('#navCamera') };
+function showSection(name) {
+  document.body.classList.toggle('camera-open', name === 'camera');
+  Object.entries(navTabs).forEach(([key, tab]) => tab.setAttribute('aria-pressed', String(key === name)));
+}
+navTabs.templates.addEventListener('click', () => showSection('templates'));
+navTabs.camera.addEventListener('click', () => showSection('camera'));
+// Action row: Retake clears the shot; Export shares or downloads.
+document.querySelector('#retakeButton').addEventListener('click', () => { if(state.counting)return; state.shots=[]; updateShots(); });
+document.querySelector('#exportButton').addEventListener('click', () => {
   if (!exportFile) { showToast(complete() ? 'Preparing your photo…' : 'Take a photo first.'); return; }
   if (!shareButton.hidden) sharePhoto(); else downloadPhoto();
 });
+// Strip arrows scroll whichever strip is showing.
+document.querySelectorAll('.strip-arrow').forEach(arrow => arrow.addEventListener('click', () => {
+  const strip = document.querySelector(document.body.classList.contains('camera-open') ? '#cameraGroup' : '#templateGroup');
+  strip.scrollBy({ left: Number(arrow.dataset.dir) * strip.clientWidth * 0.8, behavior: 'smooth' });
+}));
 document.querySelectorAll('.upload-trigger').forEach(button => button.addEventListener('click', () => document.querySelector('#uploadPhoto').click()));
 shareButton.addEventListener('click', sharePhoto);
 document.querySelector('#flipCamera').addEventListener('click', flipCamera);
