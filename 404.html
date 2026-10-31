@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Y2K Photobooth</title>
+    <script>
+      // "/windows" without a trailing slash would 404 on Pages; send it to "/windows/".
+      var p = location.pathname;
+      if (!/\/$/.test(p) && !/\.[a-z0-9]+$/i.test(p)) location.replace(p + '/' + location.search + location.hash);
+    </script>
+  </head>
+  <body style="font-family:system-ui;padding:24px">
+    <p>Not found. <a href="./">Back to Y2K Photobooth</a></p>
+  </body>
+</html>
