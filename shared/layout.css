@@ -24,6 +24,8 @@
 .canvas-wrap:has(.camera-empty:not(.hidden)) { flex: none; width: auto; height: min(40svh, 380px); margin: 4px 6px 0; aspect-ratio: auto !important; }
 #preview { object-fit: contain; }
 .canvas-wrap:has(.camera-empty:not(.hidden)) { min-height: 0; }
+/* Once a template or the camera is showing, the empty-state card is fully gone. */
+.camera-empty.hidden { opacity: 0 !important; visibility: hidden; }
 /* Template strip: names above thumbnails, scrolls sideways. */
 .control-panel, .control-panel.expanded { position: relative; margin: 6px 6px 6px; max-height: none; overflow: hidden; }
 .control-panel > * { display: none !important; }
