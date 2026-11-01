@@ -479,6 +479,7 @@ document.querySelector('#panelOpen').addEventListener('click', () => togglePanel
 const navTabs = [...document.querySelectorAll('.nav-tab[data-section]')];
 function showSection(name) {
   document.body.dataset.section = name;
+  requestAnimationFrame(() => { const s = [...document.querySelectorAll('.control-panel > .control-group, .control-panel > .shots-wrap')].find(g => g.offsetParent !== null); if (s) reportStrip(s); });
   navTabs.forEach(tab => tab.setAttribute('aria-pressed', String(tab.dataset.section === name)));
 }
 navTabs.forEach(tab => tab.addEventListener('click', () => {
@@ -492,6 +493,17 @@ document.querySelector('#exportButton').addEventListener('click', () => {
   if (!exportFile) { showToast(complete() ? 'Preparing your photo…' : 'Take a photo first.'); return; }
   if (!shareButton.hidden) sharePhoto(); else downloadPhoto();
 });
+// Each strip reports its scroll position so a theme can draw a scrollbar (--strip-pos / --strip-size).
+const stripPanel = document.querySelector('.control-panel');
+function reportStrip(strip) {
+  const range = strip.scrollWidth - strip.clientWidth;
+  stripPanel.style.setProperty('--strip-size', String(range > 0 ? strip.clientWidth / strip.scrollWidth : 1));
+  stripPanel.style.setProperty('--strip-pos', String(range > 0 ? strip.scrollLeft / range : 0));
+}
+document.querySelectorAll('.control-panel > .control-group, .control-panel > .shots-wrap').forEach(strip => {
+  strip.addEventListener('scroll', () => reportStrip(strip), { passive: true });
+});
+new ResizeObserver(() => { const s = [...document.querySelectorAll('.control-panel > .control-group, .control-panel > .shots-wrap')].find(g => g.offsetParent !== null); if (s) reportStrip(s); }).observe(stripPanel);
 // Strip arrows scroll whichever strip is showing.
 document.querySelectorAll('.strip-arrow').forEach(arrow => arrow.addEventListener('click', () => {
   const strip = [...document.querySelectorAll('.control-panel > .control-group, .control-panel > .shots-wrap')].find(group => group.offsetParent !== null);
