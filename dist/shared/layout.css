@@ -8,19 +8,20 @@
 .stage-shell, .stage-shell:has(.artwork-preview) { display: flex; flex-direction: column; height: auto; min-height: 0; padding: 0; justify-content: flex-start; }
 .stage-topline, .stage-caption, .save-row, .panel-heading { display: none !important; }
 /* Top nav: Templates | Camera */
-.top-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 6px 6px 0; }
-.nav-tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 58px; padding: 6px 4px; cursor: pointer; font-size: 14px; line-height: 1; }
+.top-nav { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; margin: 6px 6px 0; }
+.nav-tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-width: 0; min-height: 58px; padding: 6px 2px; cursor: pointer; font-size: 13px; line-height: 1; }
+.nav-tab > span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .nav-icon { width: 26px; height: 26px; display: block; }
 /* Status line above the preview */
 .stage-status { order: -1; display: flex; align-items: center; gap: 8px; margin: 6px 6px 0; padding: 6px 10px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
 .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #2ecc40; flex: none; }
 /* Action row under the preview: Retake | Take Photo | Export */
-.capture-row { order: 0; height: auto; display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 8px; margin: 6px 6px 0; padding: 8px; border: 0; box-shadow: none; }
-.action-button, .shutter { display: flex; align-items: center; justify-content: center; gap: 8px; width: auto; height: auto; min-height: 44px; padding: 6px 10px; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 700; line-height: 1; white-space: nowrap; }
+.capture-row { order: 0; height: auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 6px 6px 0; padding: 8px; border: 0; box-shadow: none; }
+.action-button, .shutter { display: flex; align-items: center; justify-content: center; gap: 6px; width: auto; min-width: 0; height: auto; min-height: 44px; padding: 6px 8px; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 700; line-height: 1; white-space: nowrap; }
 .shutter span { display: inline; width: auto; height: auto; border-radius: 0; background: none; box-shadow: none; }
 .shutter:hover span, .shutter:active span { transform: none; }
 .action-icon { font-size: 18px; }
-.canvas-wrap, .artwork-preview { flex: none; width: auto; height: auto; margin: 4px 6px 0; max-height: min(46svh, 460px); }
+.canvas-wrap, .artwork-preview { flex: none; width: auto; height: auto; margin: 4px 6px 0; max-height: min(54svh, 540px); }
 .canvas-wrap:has(.camera-empty:not(.hidden)) { flex: none; width: auto; height: min(40svh, 380px); margin: 4px 6px 0; aspect-ratio: auto !important; }
 #preview { object-fit: contain; }
 .canvas-wrap:has(.camera-empty:not(.hidden)) { min-height: 0; }
@@ -29,16 +30,22 @@
 /* Template strip: names above thumbnails, scrolls sideways. */
 .control-panel, .control-panel.expanded { position: relative; margin: 6px 6px 6px; max-height: none; overflow: hidden; }
 .control-panel > * { display: none !important; }
-.control-panel > #templateGroup { display: flex !important; }
-body.camera-open .control-panel > #templateGroup { display: none !important; }
-body.camera-open .control-panel > #cameraGroup { display: flex !important; }
+/* One strip per nav section */
+body[data-section="templates"] .control-panel > #templateGroup, body[data-section="backgrounds"] .control-panel > #templateGroup { display: flex !important; }
+body[data-section="templates"] #templateGroup > .template-grid, body[data-section="templates"] #templateGroup > .basic-label { display: none; }
+body[data-section="backgrounds"] #templateGroup > .artwork-gallery { display: none; }
+body[data-section="camera"] .control-panel > #cameraGroup { display: flex !important; }
+body[data-section="effects"] .control-panel > #effectsGroup, body[data-section="effects"] .control-panel > #extrasGroup { display: flex !important; }
+body[data-section="gallery"] .control-panel > .shots-wrap { display: block !important; }
 .control-panel > #stripPrev, .control-panel > #stripNext { display: grid !important; place-items: center; position: absolute; top: 0; bottom: 0; width: 24px; padding: 0; cursor: pointer; font-size: 22px; line-height: 1; }
 .control-panel > #stripPrev { left: 0; } .control-panel > #stripNext { right: 0; }
 .camera-tools { display: flex; gap: 8px; flex: none; }
 .tool-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 6px 12px; border-radius: 30px; cursor: pointer; font-size: 14px; white-space: nowrap; }
-#cameraGroup { flex-direction: row; align-items: center; }
-#cameraGroup > .filter-list { flex: none; }
-.control-panel > .control-group { gap: 10px; align-items: flex-start; padding: 8px 30px 4px; border: 0; box-shadow: none; overflow-x: auto; overscroll-behavior-x: contain; }
+#cameraGroup, #effectsGroup, #extrasGroup { flex-direction: row; align-items: center; }
+#effectsGroup > .filter-list, #extrasGroup > .extra-list { flex: none; flex-wrap: nowrap; }
+#extrasGroup { padding-top: 0; }
+.control-panel > .shots-wrap { padding: 8px 30px 4px; overflow-x: auto; }
+.control-panel .shots { display: flex; gap: 8px; } .control-panel .shot { flex: none; width: 86px; height: 86px; }
 .control-panel .control-title, .control-panel .basic-label { display: none; }
 .artwork-gallery, .template-grid { display: flex; flex-wrap: nowrap; gap: 8px; }
 .artwork-card, .template-card { flex: none; width: 104px; min-height: 0; padding: 0; border: 0; box-shadow: none; background: transparent; display: flex; flex-direction: column-reverse; align-items: stretch; justify-content: flex-start; }
