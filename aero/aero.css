@@ -89,7 +89,7 @@ button:focus-visible, a:focus-visible { outline: 4px solid #ffe96a; outline-offs
 @media (max-width: 600px) {
   /* Phones: a smaller window so the meadow shows underneath; no window buttons. */
   .site-header .brand::after, .brand > .win-controls { display: none !important; }
-  .window { margin: 8px 8px 0; padding: 4px; border-radius: 14px; }
+  .window { margin: 10px 16px 0; padding: 4px; border-radius: 14px; }
   .window::after { inset: 2px; border-radius: 10px; }
   .site-header .brand { height: 42px; gap: 8px; padding: 0 8px; font-size: 15px; border-radius: 10px 10px 5px 5px; }
   .brand-mark { width: 24px; height: 24px; padding: 3px; gap: 2px; }
@@ -100,17 +100,18 @@ button:focus-visible, a:focus-visible { outline: 4px solid #ffe96a; outline-offs
   .stage-status { height: 30px; font-size: 12px; gap: 6px; }
   .stage-status::before { width: 24px; height: 24px; }
   .status-dot { width: 11px; height: 11px; }
-  .canvas-wrap, .artwork-preview { max-height: 38svh; }
+  .canvas-wrap, .artwork-preview { height: 36svh; }
   .capture-row { margin-top: 4px; padding: 7px 6px; gap: 6px; }
   .action-button, .shutter { min-height: 42px; font-size: 13px; gap: 4px; border-radius: 10px; }
   .action-icon, .shutter span::before { width: 22px; height: 22px; }
   .control-panel, .control-panel.expanded { margin-top: 4px; }
-  .control-panel > .control-group, .control-panel > .shots-wrap { padding: 8px 34px 22px; }
+  .control-panel > .control-group, .control-panel > .shots-wrap { padding: 8px 40px 24px; scroll-padding: 0 40px; }
   .artwork-card, .template-card { width: 64px; }
   .artwork-card img, .template-card .template-icon { height: 64px; }
   .control-panel .shot { width: 64px; height: 64px; }
   .control-panel::after { left: 24px; right: 24px; bottom: 6px; height: 11px; }
-  .control-panel > #stripPrev, .control-panel > #stripNext { width: 28px; height: 34px; font-size: 30px; line-height: 22px; }
+  .control-panel::before { --track: calc(100% - 56px); bottom: 9px; height: 5px; left: calc(28px + (var(--track) - max(28px, var(--track) * var(--strip-size))) * var(--strip-pos)); }
+  .control-panel > #stripPrev, .control-panel > #stripNext { width: 34px; height: 44px; font-size: 32px; line-height: 24px; }
   body::before, body::after, .site-header::before, .site-header::after { width: 22px; height: 22px; }
   .booth { padding-bottom: 4px; }
 }
@@ -120,7 +121,7 @@ button:focus-visible, a:focus-visible { outline: 4px solid #ffe96a; outline-offs
 .stage-status { margin: 0; padding: 0 2px; height: 40px; border: 0; background: transparent; box-shadow: none; gap: 10px; color: #00599d; font: 700 clamp(13px, 3.8vw, 20px)/1 var(--mono); letter-spacing: 0; text-shadow: 0 1px #fff; }
 .stage-status::before { content: ""; width: 32px; height: 32px; flex: none; background: url("./assets/camera.png") center / contain no-repeat; filter: drop-shadow(0 2px 2px rgba(1,75,141,.2)); }
 .status-dot { width: 14px; height: 14px; background: radial-gradient(circle at 35% 30%,#eeffce 0 10%,#68ed39 24%,#08b73b 70%); border: 1px solid #36b633; box-shadow: 0 0 0 1px #d9ffdc, 0 0 5px #36f14380; }
-.canvas-wrap, .artwork-preview, .canvas-wrap:has(.camera-empty:not(.hidden)) { margin: 0; border-radius: 9px; border: 2px solid #e5ffff; overflow: hidden; background: #fff;
+.canvas-wrap, .artwork-preview, .canvas-wrap:has(.camera-empty:not(.hidden)) { margin: 0; border-radius: 9px; border: 2px solid #e5ffff; overflow: hidden; background: linear-gradient(180deg, #eaf9ff, #fff);
   box-shadow: 0 0 0 2px #7edbfa, 0 0 0 4px #087bb0, 0 0 14px #00baf8; }
 .canvas-wrap::after { content: ""; position: absolute; inset: 0; z-index: 3; border-radius: 6px; box-shadow: inset 0 0 6px 3px #ffffffba, inset 0 0 18px #9affff5c; pointer-events: none; }
 .camera-empty { color: var(--ink); } .camera-empty p { color: var(--blue); }
@@ -149,18 +150,23 @@ button:focus-visible, a:focus-visible { outline: 4px solid #ffe96a; outline-offs
 
 /* Template carousel */
 .control-panel, .control-panel.expanded { margin: 6px 0 0; padding: 0; background: linear-gradient(130deg,#fff 0%,#d7f5ffea 30%,#cbf2ffed 75%,#b9ecff); }
-.control-panel > .control-group, .control-panel > .shots-wrap { padding: 10px 40px 26px; gap: 6px; scrollbar-width: none; }
+.control-panel > .control-group, .control-panel > .shots-wrap { padding: 10px 46px 26px; gap: 6px; scrollbar-width: none; scroll-padding: 0 46px; }
 .control-panel > .control-group::-webkit-scrollbar { display: none; }
 .artwork-card, .template-card { width: 76px; }
 .artwork-card img, .template-card .template-icon { height: 76px; padding: 2px; box-sizing: border-box; border-radius: 9px; border: 2px solid #8cccea; background: #fff; object-fit: cover; box-shadow: inset 0 0 0 2px #fff, 0 0 0 2px #eaffff, 0 3px 7px #1889b65c; transition: transform .15s; }
 .artwork-card:hover img, .template-card:hover .template-icon { transform: translateY(-2px); }
 .artwork-card span, .template-card strong { display: none; }
 .artwork-card.active img, .template-card.active .template-icon { border-color: #09db23; box-shadow: 0 0 0 2px #edffe7, inset 0 0 0 2px #b9ff85, 0 0 0 4px #4ae943, 0 0 16px #29ff33; }
+.control-panel { --strip-pos: 0; --strip-size: 1; }
 .control-panel::after { content: ""; position: absolute; left: 30px; right: 30px; bottom: 7px; height: 13px; border: 2px solid #a3ecff; border-radius: 11px; pointer-events: none;
-  background: linear-gradient(90deg, transparent 26%, #b2eeff 26%, #37b4ed 26% 74%, transparent 74%) center / 100% 7px no-repeat, linear-gradient(#5bc4f1,#ddfbff 50%,#a0e8ff); box-shadow: 0 0 0 1px #1b9be3, 0 0 0 3px #e8ffff, inset 0 1px 2px #2588c0; }
-.control-panel > #stripPrev, .control-panel > #stripNext { top: 50%; bottom: auto; transform: translateY(-62%); width: 34px; height: 42px; padding: 0 0 6px; border: 2px solid #66b8e9; border-radius: 50%; color: #0872cb; font: 700 36px/26px var(--font); text-shadow: 0 2px #fff;
+  background: linear-gradient(#5bc4f1,#ddfbff 50%,#a0e8ff); box-shadow: 0 0 0 1px #1b9be3, 0 0 0 3px #e8ffff, inset 0 1px 2px #2588c0; }
+.control-panel::before { content: ""; position: absolute; z-index: 1; bottom: 10px; height: 7px; border-radius: 6px; pointer-events: none;
+  --track: calc(100% - 68px); width: max(28px, calc(var(--track) * var(--strip-size)));
+  left: calc(34px + (var(--track) - max(28px, var(--track) * var(--strip-size))) * var(--strip-pos));
+  background: linear-gradient(#b2eeff,#37b4ed 48%,#007ec9 52%,#29cbf8); border: 1px solid #087ac1; box-shadow: inset 0 1px #fff; transition: left .08s linear; }
+.control-panel > #stripPrev, .control-panel > #stripNext { top: 50%; bottom: auto; transform: translateY(-62%); width: 38px; height: 46px; padding: 0 0 6px; border: 2px solid #66b8e9; border-radius: 50%; color: #0872cb; font: 700 36px/26px var(--font); text-shadow: 0 2px #fff;
   background: linear-gradient(145deg,#fff,#bbf4ff 46%,#55c7f4 51%,#b3f4ff); box-shadow: inset 0 0 0 2px #fff, inset 0 0 6px #fff, 0 0 0 1px #bcf6ff, 0 2px 5px #0d86be66; }
-.control-panel > #stripPrev { left: 5px; } .control-panel > #stripNext { right: 5px; }
+.control-panel > #stripPrev { left: 4px; } .control-panel > #stripNext { right: 4px; }
 .control-panel > .strip-arrow:active { transform: translateY(-62%) scale(.95); }
 .control-panel .shot { border-radius: 9px; border: 2px solid #8cccea; background: #fff; box-shadow: inset 0 0 0 2px #fff, 0 3px 7px #1889b65c; }
 .control-panel .shots-head { display: none; }
