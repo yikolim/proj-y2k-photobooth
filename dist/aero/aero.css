@@ -8,9 +8,21 @@
   --glass-shadow: inset 0 0 0 2px #efffff, inset 0 3px 4px 2px #fff, inset 0 -4px 7px #36c9f4b0, 0 0 0 1px #98edff, 0 2px 4px #0479ad90;
 }
 
-html { background: #059ef3; min-height: 100%; }
-body { color: var(--ink); font-family: var(--font); font-weight: 700; background: #059ef3 url("./assets/wallpaper.jpg") center top / cover no-repeat fixed; }
-@media (min-width: 601px) { body { margin: 0 auto; min-height: 100svh; padding: 28px 0 40px; background-attachment: fixed; } }
+/* Wallpaper on the viewport (html), not the 480px body column, so the grass
+   and clouds fill the whole page. Anchored to the bottom so the meadow shows. */
+html { min-height: 100%; background: #059ef3 url("./assets/wallpaper.jpg") center bottom / cover no-repeat; }
+body { color: var(--ink); font-family: var(--font); font-weight: 700; background: transparent; }
+@media (min-width: 601px) { html { background-attachment: fixed; } body { margin: 0 auto; min-height: 100svh; padding: 28px 0 40px; } }
+/* Sparkle glints floating around the window */
+body::before, body::after, .site-header::before, .site-header::after { content: ""; position: absolute; z-index: 7; width: 44px; height: 44px; pointer-events: none;
+  background: radial-gradient(circle, #fff 0 8%, #fff9 10%, transparent 30%), linear-gradient(90deg, transparent 46%, #fff 49% 51%, transparent 54%), linear-gradient(0deg, transparent 46%, #fff 49% 51%, transparent 54%);
+  filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 9px #a9ecff); animation: twinkle 2.6s ease-in-out infinite; }
+body { position: relative; }
+body::before { left: -6px; top: 14px; } body::after { right: -8px; top: 52%; width: 56px; height: 56px; animation-delay: -1.2s; }
+.site-header::before { left: 30%; top: -18px; width: 30px; height: 30px; animation-delay: -.6s; }
+.site-header::after { right: 18%; bottom: -14px; width: 34px; height: 34px; animation-delay: -1.9s; }
+@keyframes twinkle { 0%, 100% { transform: scale(.75) rotate(0deg); opacity: .75; } 50% { transform: scale(1.1) rotate(12deg); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { body::before, body::after, .site-header::before, .site-header::after { animation: none; } }
 button, input, .text-button { font-family: inherit; }
 button:focus-visible, a:focus-visible { outline: 4px solid #ffe96a; outline-offset: 2px; }
 
@@ -32,7 +44,7 @@ button:focus-visible, a:focus-visible { outline: 4px solid #ffe96a; outline-offs
 .booth { margin: 0; padding: 0 0 8px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 
 /* ---- Title bar ---- */
-.site-header { height: auto !important; min-height: 0; padding: 0 !important; display: block !important; border: 0; background: transparent; }
+.site-header { position: relative; height: auto !important; min-height: 0; padding: 0 !important; display: block !important; border: 0; background: transparent; }
 .site-header .brand { position: relative; z-index: 1; display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 14px; width: auto; min-width: 100%; box-sizing: border-box; margin: 0;
   height: 60px; padding: 0 10px; overflow: hidden; border: 1px solid #0474cf; border-radius: 14px 14px 7px 7px; color: #fff;
   font: 700 clamp(15px, 4.6vw, 24px)/1 var(--mono); letter-spacing: -1px; white-space: nowrap; text-shadow: 0 1px 0 #d5ffff, 0 2px 2px #004192, 0 0 5px #ffffff60;
