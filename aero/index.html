@@ -37,8 +37,12 @@
 
       <section class="booth" aria-label="Photo booth studio">
         <nav class="top-nav" aria-label="Sections">
-          <button class="nav-tab" id="navTemplates" aria-pressed="true"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="9.5" r="1.8" fill="currentColor"/><path d="M4 18l5-5 3.5 3.5L15 14l5 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Templates</span></button>
-          <button class="nav-tab" id="navCamera" aria-pressed="false"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3.5l1.5-2.5h6L16.5 8H20a1.5 1.5 0 0 1 1.5 1.5V18A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9.5A1.5 1.5 0 0 1 4 8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span>Camera</span></button>
+          <button class="nav-tab" id="navTemplates" data-section="templates" aria-pressed="true"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="9.5" r="1.8" fill="currentColor"/><path d="M4 18l5-5 3.5 3.5L15 14l5 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Templates</span></button>
+          <button class="nav-tab" id="navCamera" data-section="camera" aria-pressed="false"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3.5l1.5-2.5h6L16.5 8H20a1.5 1.5 0 0 1 1.5 1.5V18A1.5 1.5 0 0 1 20 19.5H4A1.5 1.5 0 0 1 2.5 18V9.5A1.5 1.5 0 0 1 4 8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span>Camera</span></button>
+          <button class="nav-tab" id="navEffects" data-section="effects" aria-pressed="false"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z" fill="currentColor"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z" fill="currentColor"/></svg><span>Effects</span></button>
+          <button class="nav-tab" id="navBackgrounds" data-section="backgrounds" aria-pressed="false"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3v18" stroke="currentColor" stroke-width="1.8"/></svg><span>Backgrounds</span></button>
+          <button class="nav-tab" id="navGallery" data-section="gallery" aria-pressed="false"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="6" width="14" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8" transform="rotate(-6 12 12)"/><rect x="5" y="6" width="14" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8" transform="rotate(6 12 12)"/></svg><span>Gallery</span></button>
+          <button class="nav-tab" id="navShare" data-section="share"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4m0 0L8 8m4-4l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Share</span></button>
         </nav>
         <div class="stage-shell">
           <div class="stage-topline">
@@ -119,6 +123,10 @@
               <button class="tool-chip" id="flipCamera"><span aria-hidden="true">↻</span>Flip camera</button>
               <button class="tool-chip upload-trigger"><span aria-hidden="true">↥</span>Upload photo</button>
             </div>
+          </div>
+
+          <div class="control-group" id="effectsGroup">
+            <div class="control-title"><span>03</span><h3>Effects</h3></div>
             <div class="filter-list" id="filterList">
               <button class="filter-chip active" data-filter="clean"><span class="swatch swatch-clean"></span>Clean</button>
               <button class="filter-chip" data-filter="glow"><span class="swatch swatch-glow"></span>Glow</button>
@@ -136,8 +144,8 @@
             <div class="fit-actions"><button class="text-button" id="clearSlot">Retake</button><button class="text-button" id="resetFit">Reset position</button></div>
           </div>
 
-          <div class="control-group">
-            <div class="control-title"><span>03</span><h3>Add a little extra</h3></div>
+          <div class="control-group" id="extrasGroup">
+            <div class="control-title"><h3>Add a little extra</h3></div>
             <div class="extra-list" id="extraList">
               <button class="extra-chip active" data-extra="none">None</button>
               <button class="extra-chip" data-extra="sparkles">✦ Sparkles</button>

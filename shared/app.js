@@ -475,14 +475,17 @@ function togglePanel(force) {
 }
 // The whole "Select templates" bar is the tap target on phones.
 document.querySelector('#panelOpen').addEventListener('click', () => togglePanel());
-// Top nav: Templates shows the template strip, Camera shows flip/upload + filters.
-const navTabs = { templates: document.querySelector('#navTemplates'), camera: document.querySelector('#navCamera') };
+// Top nav: each tab shows one strip in the panel (body[data-section]); Share exports.
+const navTabs = [...document.querySelectorAll('.nav-tab[data-section]')];
 function showSection(name) {
-  document.body.classList.toggle('camera-open', name === 'camera');
-  Object.entries(navTabs).forEach(([key, tab]) => tab.setAttribute('aria-pressed', String(key === name)));
+  document.body.dataset.section = name;
+  navTabs.forEach(tab => tab.setAttribute('aria-pressed', String(tab.dataset.section === name)));
 }
-navTabs.templates.addEventListener('click', () => showSection('templates'));
-navTabs.camera.addEventListener('click', () => showSection('camera'));
+navTabs.forEach(tab => tab.addEventListener('click', () => {
+  if (tab.dataset.section === 'share') { document.querySelector('#exportButton').click(); return; }
+  showSection(tab.dataset.section);
+}));
+showSection('templates');
 // Action row: Retake clears the shot; Export shares or downloads.
 document.querySelector('#retakeButton').addEventListener('click', () => { if(state.counting)return; state.shots=[]; updateShots(); });
 document.querySelector('#exportButton').addEventListener('click', () => {
@@ -491,7 +494,8 @@ document.querySelector('#exportButton').addEventListener('click', () => {
 });
 // Strip arrows scroll whichever strip is showing.
 document.querySelectorAll('.strip-arrow').forEach(arrow => arrow.addEventListener('click', () => {
-  const strip = document.querySelector(document.body.classList.contains('camera-open') ? '#cameraGroup' : '#templateGroup');
+  const strip = [...document.querySelectorAll('.control-panel > .control-group, .control-panel > .shots-wrap')].find(group => group.offsetParent !== null);
+  if (!strip) return;
   strip.scrollBy({ left: Number(arrow.dataset.dir) * strip.clientWidth * 0.8, behavior: 'smooth' });
 }));
 document.querySelectorAll('.upload-trigger').forEach(button => button.addEventListener('click', () => document.querySelector('#uploadPhoto').click()));
