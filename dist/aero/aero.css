@@ -86,7 +86,34 @@ button:focus-visible, a:focus-visible { outline: 4px solid #ffe96a; outline-offs
 #navBackgrounds::before { background-image: url("./assets/backgrounds.png"); }
 #navGallery::before { background-image: url("./assets/gallery.png"); filter: hue-rotate(150deg) saturate(1.1) drop-shadow(0 3px 2px #00679e50); }
 #navShare::before { background-image: url("./assets/share.png"); }
-@media (max-width: 600px) { .site-header .brand::after { display: none; } .top-nav { height: 72px; gap: 2px; } .nav-tab { font-size: 10px; padding-bottom: 4px; } .nav-tab::before { width: 44px; height: 44px; margin: -3px 0; } }
+@media (max-width: 600px) {
+  /* Phones: a smaller window so the meadow shows underneath; no window buttons. */
+  .site-header .brand::after, .brand > .win-controls { display: none !important; }
+  .window { margin: 8px 8px 0; padding: 4px; border-radius: 14px; }
+  .window::after { inset: 2px; border-radius: 10px; }
+  .site-header .brand { height: 42px; gap: 8px; padding: 0 8px; font-size: 15px; border-radius: 10px 10px 5px 5px; }
+  .brand-mark { width: 24px; height: 24px; padding: 3px; gap: 2px; }
+  .top-nav { height: 58px; gap: 2px; margin-top: 4px; padding: 3px; }
+  .nav-tab { font-size: 9px; padding: 1px 1px 3px; gap: 1px; border-radius: 8px; }
+  .nav-tab::before { width: 34px; height: 34px; margin: -2px 0; }
+  .stage-shell { margin-top: 4px; padding: 0 4px 4px; }
+  .stage-status { height: 30px; font-size: 12px; gap: 6px; }
+  .stage-status::before { width: 24px; height: 24px; }
+  .status-dot { width: 11px; height: 11px; }
+  .canvas-wrap, .artwork-preview { max-height: 38svh; }
+  .capture-row { margin-top: 4px; padding: 7px 6px; gap: 6px; }
+  .action-button, .shutter { min-height: 42px; font-size: 13px; gap: 4px; border-radius: 10px; }
+  .action-icon, .shutter span::before { width: 22px; height: 22px; }
+  .control-panel, .control-panel.expanded { margin-top: 4px; }
+  .control-panel > .control-group, .control-panel > .shots-wrap { padding: 8px 34px 22px; }
+  .artwork-card, .template-card { width: 64px; }
+  .artwork-card img, .template-card .template-icon { height: 64px; }
+  .control-panel .shot { width: 64px; height: 64px; }
+  .control-panel::after { left: 24px; right: 24px; bottom: 6px; height: 11px; }
+  .control-panel > #stripPrev, .control-panel > #stripNext { width: 28px; height: 34px; font-size: 30px; line-height: 22px; }
+  body::before, body::after, .site-header::before, .site-header::after { width: 22px; height: 22px; }
+  .booth { padding-bottom: 4px; }
+}
 
 /* Camera area: status row + preview */
 .stage-shell { margin: 6px 0 0; padding: 0 6px 6px; }
